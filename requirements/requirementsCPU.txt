@@ -1,0 +1,4 @@
+fastapi[all]
+numpy
+segment-anything-fast
+opencv-contrib-python
