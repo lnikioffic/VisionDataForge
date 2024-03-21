@@ -67,3 +67,21 @@ async def put_user_account(request: Request):
 @router.get("/account-delete", response_class=HTMLResponse)
 async def delete_user_account(request: Request):
     return templates.TemplateResponse(request=request, name="user-account-delete.html")
+
+
+#Отображает раздел для карточки датасета пользователя
+@router.get("/dataset-get", response_class=HTMLResponse)
+async def get_user_dataset(request: Request):
+    return templates.TemplateResponse(request=request, name="user-dataset-get.html")
+
+
+
+#Отображает раздел для добавления карты пользователя
+@router.get("/cards-post", response_class=HTMLResponse)
+async def post_user_cards(request: Request):
+    return templates.TemplateResponse(request=request, name="user-cards-post.html")
+
+#Отображает раздел для добавления счета пользователя
+@router.get("/accounts-post", response_class=HTMLResponse)
+async def post_user_accounts(request: Request):
+    return templates.TemplateResponse(request=request, name="user-accounts-post.html")

@@ -1,7 +1,7 @@
 import json
 from fastapi import APIRouter, File, Form, UploadFile
 from videoprocessor.schemas import FrameData
-from videoprocessor.utils.video_handler import save_video, coordinate_adaptation, start_processing
+from videoprocessor.utils.video_handler import save_video, coordinate_adaptation, start_processing, get_fps_hendler
 
 router = APIRouter(prefix='/video', tags=['video'])
 
@@ -9,6 +9,14 @@ router = APIRouter(prefix='/video', tags=['video'])
 @router.post('')
 async def video_load():
     return {'message': 'ok'}
+
+
+#АПИ запрос для получения fps видео загружаемого пользователем
+@router.post("/getFPS")
+async def get_FPS(video: UploadFile = File()):
+    path = await save_video(video)
+    fps = await get_fps_hendler(path, video)
+    return {"fps": fps}
 
 
 @router.post('/uploadtest')

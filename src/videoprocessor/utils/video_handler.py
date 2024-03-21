@@ -14,17 +14,25 @@ from .farme_handler import NewFastSAMModel
 from videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
 
 
-async def save_video(video_file: UploadFile):
+async def get_fps_hendler(path: str, video: UploadFile):
+    video = cv2.VideoCapture(path)
+    fps = video.get(cv2.CAP_PROP_FPS)
+    video.release()
+    os.remove(path)
+    return fps
+
+
+async def save_video(video: UploadFile):
     # Генерируем уникальное имя файла
     # file_extension = os.path.splitext(video_file.filename)[-1]
     # unique_filename = f"{uuid.uuid4()}{file_extension}"
 
     # Создаем путь до директории для сохранения файла
-    file_path = os.path.join(UPLOAD_FOLDER, video_file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, video.filename)
 
     # Сохраняем файл в директорию
     async with aiofiles.open(file_path, "wb") as f:
-        while chunk := await video_file.read(DEFAULT_CHUNK_SIZE):
+        while chunk := await video.read(DEFAULT_CHUNK_SIZE):
             await f.write(chunk)
 
     # Возвращаем путь до сохраненного файла
