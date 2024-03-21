@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from .schemas import BoundingBoxesObject
+from ..schemas import BoundingBoxesObject
 
 
 class Tracker:

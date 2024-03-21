@@ -5,8 +5,75 @@
 
 import numpy as np
 import cv2
+import aiofiles
+import os
+from fastapi import UploadFile
 from .tracker import TrackersClasses, create_Trackers
-from .schemas import BoundingBoxesObject
+from ..schemas import BoundingBoxesObject, FrameData
+from .farme_handler import NewFastSAMModel
+from videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
+
+
+async def save_video(video_file: UploadFile):
+    # Генерируем уникальное имя файла
+    # file_extension = os.path.splitext(video_file.filename)[-1]
+    # unique_filename = f"{uuid.uuid4()}{file_extension}"
+
+    # Создаем путь до директории для сохранения файла
+    file_path = os.path.join(UPLOAD_FOLDER, video_file.filename)
+
+    # Сохраняем файл в директорию
+    async with aiofiles.open(file_path, "wb") as f:
+        while chunk := await video_file.read(DEFAULT_CHUNK_SIZE):
+            await f.write(chunk)
+
+    # Возвращаем путь до сохраненного файла
+    return file_path
+
+
+async def coordinate_adaptation(path: str, frame_data: FrameData):
+    video = cv2.VideoCapture(path)
+    video.set(cv2.CAP_PROP_POS_FRAMES, frame_data.current_frame)
+
+
+    frame_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    ratioWidth = frame_width / round(frame_data.frame_data[0], 2);
+    ratioHeight = frame_height / round(frame_data.frame_data[1], 2);
+    for bbox_obj in frame_data.bboxes_objects:
+        bboxes = bbox_obj.bboxes
+        for bbox in bboxes:
+            bbox[0] = round(bbox[0] * ratioHeight)
+            bbox[1] = round(bbox[1] * ratioWidth)
+            bbox[2] = round(bbox[2] * ratioHeight)
+            bbox[3] = round(bbox[3] * ratioWidth)    
+
+
+async def start_processing(path: str, frame_data: FrameData):
+    video = cv2.VideoCapture(path)
+    ret, frame = video.read()
+    trackers_classes = create_Trackers(frame, frame_data.bboxes_objects)
+    video.release()
+    frames = play_video(path, trackers_classes, frame_data.current_frame)
+
+    fastSAM = NewFastSAMModel('models/FastSAM-s.pt')
+
+    for frame in frames:
+        fastSAM.set_prompt(frame.farme)
+        fr_cop = frame.farme.copy()
+        for cl in frame.names_classes:
+            cl.set_new_ROI(fastSAM)
+            for box in cl.ROIs:
+                (x, y, w, h) = [v for v in box[0]]
+                cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
+                cv2.putText(fr_cop, cl.name, (x, y), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
+        cv2.imshow("test", fr_cop)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cv2.destroyAllWindows()
+    print(len(frames))
 
 
 class ROIsObject:
@@ -28,12 +95,13 @@ def rectangle(frame, x, y, w, h):
     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2, 1)
 
 
-def play_video(path: str, trackers_classes: list[TrackersClasses]) -> list[Frame]:
+def play_video(path: str, trackers_classes: list[TrackersClasses], frame: int = 0) -> list[Frame]:
     video = cv2.VideoCapture(path)
 
     l = 0
     k = 0
     frames = []
+    video.set(cv2.CAP_PROP_POS_FRAMES, frame)
     while video.isOpened():
         ret, frame = video.read()
         if not ret:
@@ -70,8 +138,7 @@ def play_video(path: str, trackers_classes: list[TrackersClasses]) -> list[Frame
     return frames
 
 
-def create_test(pa):
-    path = 'E:/Python Program/VisionDataForge/data/video/n.mp4'
+def create_test(path):
     video = cv2.VideoCapture(path)
     ret, frame = video.read()
     frame_cop = frame.copy()
@@ -89,6 +156,27 @@ def create_test(pa):
     cv2.destroyAllWindows()
     trackers_classes = create_Trackers(frame, data)
     frames = play_video(path, trackers_classes)
+
+    fastSAM = NewFastSAMModel('models/FastSAM-s.pt')
+    # # name_dir = os.path.splitext(path)
+    # # os.mkdir(name_dir[0])
+    # # path_im = name_dir[0]
+    # for frame in frames:
+    #     fastSAM.set_prompt(frame.farme)
+    #     fr_cop = frame.farme.copy()
+    #     for cl in frame.names_classes:
+    #         cl.set_new_ROI(fastSAM)
+    #         for box in cl.ROIs:
+    #             (x, y, w, h) = [v for v in box[0]]
+    #             cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
+    #             cv2.putText(fr_cop, cl.name, (x, y), 
+    #                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
+    #     cv2.imshow("test", fr_cop)
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break
+    # cv2.destroyAllWindows()
+    # print(len(frames))
+
 
 if __name__ == '__main__':
     path = 'VisionDataForge/data/video/n.mp4'

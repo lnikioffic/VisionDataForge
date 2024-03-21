@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import os
 # import supervision as sv
-from tools.annotation_tool import threshold, morph_op, get_filtered_bboxes, get_filtered_bboxes_xywh
+from videoprocessor.utils.tools.annotation_tool import threshold, morph_op, get_filtered_bboxes, get_filtered_bboxes_xywh
 
 from fastsam import FastSAM, FastSAMPrompt, FastSAMPredictor
 from fastsam.utils import convert_box_xywh_to_xyxy
