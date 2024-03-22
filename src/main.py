@@ -58,6 +58,12 @@ async def get_company_dataset(request: Request):
     return templates.TemplateResponse(request=request, name="company-dataset.html")
 
 
+#Отображает раздел с часто задаваемыми вопросами и ответами на них
+@app.get("/user-help", response_class=HTMLResponse)
+async def get_user_help(request: Request):
+    return templates.TemplateResponse(request=request, name="user-help-get.html")
+
+
 
 if __name__ == '__main__':
     # dest = os.path.join(UPLOAD_FOLDER, 'n.mp4')

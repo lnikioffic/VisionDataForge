@@ -9,5 +9,6 @@ class BoundingBoxesObject(BaseModel):
 class FrameData(BaseModel):
     current_frame: int
     names_class: list[str] = Field(examples=[['Каска']])
-    frame_data: list[int] # хуита
+    frame_width: int
+    frame_hight: int
     bboxes_objects: list[BoundingBoxesObject]

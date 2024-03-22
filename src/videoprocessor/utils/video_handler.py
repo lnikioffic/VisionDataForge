@@ -47,15 +47,15 @@ async def coordinate_adaptation(path: str, frame_data: FrameData):
     frame_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    ratioWidth = frame_width / round(frame_data.frame_data[0], 2);
-    ratioHeight = frame_height / round(frame_data.frame_data[1], 2);
+    ratio_width = frame_width / round(frame_data.frame_width, 2);
+    ratio_height = frame_height / round(frame_data.frame_hight, 2);
     for bbox_obj in frame_data.bboxes_objects:
         bboxes = bbox_obj.bboxes
         for bbox in bboxes:
-            bbox[0] = round(bbox[0] * ratioHeight)
-            bbox[1] = round(bbox[1] * ratioWidth)
-            bbox[2] = round(bbox[2] * ratioHeight)
-            bbox[3] = round(bbox[3] * ratioWidth)    
+            bbox[0] = round(bbox[0] * ratio_height)
+            bbox[1] = round(bbox[1] * ratio_width)
+            bbox[2] = round(bbox[2] * ratio_height)
+            bbox[3] = round(bbox[3] * ratio_width)    
 
 
 async def start_processing(path: str, frame_data: FrameData):

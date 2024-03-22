@@ -1,14 +1,34 @@
 import json
-from fastapi import APIRouter, File, Form, UploadFile
+from fastapi import APIRouter, File, Form, Request, UploadFile
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from videoprocessor.schemas import FrameData
 from videoprocessor.utils.video_handler import save_video, coordinate_adaptation, start_processing, get_fps_hendler
 
 router = APIRouter(prefix='/video', tags=['video'])
 
 
+#router.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="templates")
+
+
 @router.post('')
 async def video_load():
     return {'message': 'ok'}
+
+
+#Отображает раздел аннотации фото (заглушка)
+@router.get("/annotation-photo", response_class=HTMLResponse)
+async def get_photo_annotation(request: Request):
+    return templates.TemplateResponse(request=request, name="annotation-photo.html")
+
+
+#Отображает раздел с аннотацией видео
+@router.get("/annotation-video", response_class=HTMLResponse)
+async def get_video_annotation(request: Request):
+    return templates.TemplateResponse(request=request, name="annotation-video.html")
 
 
 #АПИ запрос для получения fps видео загружаемого пользователем
