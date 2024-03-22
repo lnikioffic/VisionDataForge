@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 
 router = APIRouter(prefix='/users', tags=['users'])
 
-#router.mount('/static', StaticFiles(directory='static'), name='static')
+router.mount('/static', StaticFiles(directory='static'), name='static')
 
 templates = Jinja2Templates(directory="templates")
 

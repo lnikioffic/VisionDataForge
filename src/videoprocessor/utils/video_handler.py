@@ -47,8 +47,8 @@ async def coordinate_adaptation(path: str, frame_data: FrameData):
     frame_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    ratio_width = frame_width / round(frame_data.frame_width, 2);
-    ratio_height = frame_height / round(frame_data.frame_hight, 2);
+    ratio_width = frame_width / round(frame_data.frame_width, 2)
+    ratio_height = frame_height / round(frame_data.frame_height, 2)
     for bbox_obj in frame_data.bboxes_objects:
         bboxes = bbox_obj.bboxes
         for bbox in bboxes:
@@ -68,8 +68,8 @@ async def start_processing(path: str, frame_data: FrameData):
     fastSAM = NewFastSAMModel('models/FastSAM-s.pt')
 
     for frame in frames:
-        fastSAM.set_prompt(frame.farme)
-        fr_cop = frame.farme.copy()
+        fastSAM.set_prompt(frame.frame)
+        fr_cop = frame.frame.copy()
         for cl in frame.names_classes:
             cl.set_new_ROI(fastSAM)
             for box in cl.ROIs:
@@ -94,8 +94,8 @@ class ROIsObject:
 
 
 class Frame:
-    def __init__(self, farme: np.array, names_classes: list[ROIsObject]):
-        self.farme = farme
+    def __init__(self, frame: np.array, names_classes: list[ROIsObject]):
+        self.frame = frame
         self.names_classes = names_classes
 
 

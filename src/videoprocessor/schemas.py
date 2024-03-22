@@ -10,5 +10,5 @@ class FrameData(BaseModel):
     current_frame: int
     names_class: list[str] = Field(examples=[['Каска']])
     frame_width: int
-    frame_hight: int
+    frame_height: int
     bboxes_objects: list[BoundingBoxesObject]

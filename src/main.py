@@ -19,7 +19,7 @@ app.include_router(auth_router)
 app.include_router(users_router)
 
 
-#app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 

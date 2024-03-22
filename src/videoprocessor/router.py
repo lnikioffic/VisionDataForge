@@ -9,7 +9,7 @@ from videoprocessor.utils.video_handler import save_video, coordinate_adaptation
 router = APIRouter(prefix='/video', tags=['video'])
 
 
-#router.mount("/static", StaticFiles(directory="static"), name="static")
+router.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
