@@ -1,0 +1,124 @@
+{% extends 'user-profile-base.html' %}
+
+{% block profile %}
+<div class="wide right-section-datasets">
+    <div class="dataset-functional">
+        <h1>Мои датасеты</h1>
+        <form class="search-form">
+            <input type="text" placeholder="Введите название">
+            <select>
+                <option value="all">Все категории</option>
+                <option value="category1">Категория 1</option>
+                <option value="category2">Категория 2</option>
+                <option value="category3">Категория 3</option>
+            </select>
+            <button type="submit"><img src="{{ url_for('static', path='/images/search.png') }}" alt="Search"></button>
+        </form>
+    </div>
+    <div class="datasets-grid">
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset1.png') }}" alt="dataset1">
+                <h3>Название: dataset 1</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <div class="dataset">
+            <a href="/user-dataset-get">
+                <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset1">
+                <h3>Название: dataset 2</h3>
+            </a>
+        </div>
+        <!-- добавьте еще datasets при необходимости -->
+    </div>
+</div>
+{% endblock %}

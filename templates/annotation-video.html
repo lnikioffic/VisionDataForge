@@ -1,0 +1,74 @@
+{% extends 'company-base.html' %}
+
+{% block content %}
+<h1>Аннотация видео</h1>
+<div class="videoAnnotation">
+    <div class="instrument">
+        <ul>
+            <li>
+                <button id="video-upload-button" class="custom-file-upload">
+                    <img src="{{ url_for('static', path='/images/load.png') }}" alt="Загрузить видео"
+                        class="instrumentImage">
+                </button>
+                <input type="file" id="video-upload" accept="video/*" hidden>
+            </li>
+            <li>
+                <button id="startAnnotation">
+                    <img src="{{ url_for('static', path='/images/startAnnotation.png') }}" class="instrumentImage">
+                </button>
+            </li>
+            <li id="caseTargets">
+                <select name="targets" id="targets">
+                </select>
+            </li>
+            <li id="addCaseTargets">
+                <button id="addTargets">
+                    <img src="{{ url_for('static', path='/images/addTarget.png') }}" class="instrumentImage">
+                </button>
+            </li>
+            <li>
+                <button id="deleteAnnotation">
+                    <img src="{{ url_for('static', path='/images/deleteAnnotation.png') }}" class="instrumentImage">
+                </button>
+            </li>
+            <li>
+                <button id="cancelAnnotation">
+                    <img src="{{ url_for('static', path='/images/cancelAnnotation.png') }}" class="instrumentImage">
+                </button>
+            </li>
+            <li>
+                <button id="finishAnnotation">
+                    <img src="{{ url_for('static', path='/images/finishAnnotation.png') }}" class="instrumentImage">
+                </button>
+            </li>
+            <li>
+                <button id="submitAnnotation">
+                    <img src="{{ url_for('static', path='/images/submitAnnotation.png') }}" class="instrumentImage">
+                </button>
+            </li>
+        </ul>
+    </div>
+    <div class="containerAnnotation">
+        <div class="videoAnnotation">
+            <video id="video" controls></video>
+            <canvas id="canvas"></canvas>
+            <div id="modal" class="hidden">
+                <form id="annotationForm">
+                    <label for="className">Название класса аннотируемых объектов:</label>
+                    <input type="text" id="className">
+                    <button type="submit">Добавить</button>
+                    <button type="button" id="closeButton">Закрыть</button>
+                </form>
+            </div>
+        </div>
+        <div id="sliderContainer">
+            <div id="imageSlider">
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="module" src="{{ url_for('static', path='/js/script.js') }}"></script>
+{% endblock %}

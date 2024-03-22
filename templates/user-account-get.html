@@ -1,0 +1,25 @@
+{% extends 'user-profile-base.html' %}
+
+{% block profile %}
+<div class="wide right-section-account">
+    <div class="narrow top-section">
+        <div class="header-right">
+            <div class="profile-icon">
+                <img src="{{ url_for('static', path='/images/profile2.png') }}" alt="Profile Icon">
+            </div>
+            <div class="profile-info">
+                <p>Иванов Иван Иванович</p>
+                <p>Статус учетной записи: подтвержденная</p>
+            </div>
+        </div>
+    </div>
+    <div class="wide bottom-section">
+        <div class="footer-right">
+            <p>Телефон: +7 (987) 654-32-10 <a href="/user-account-put" class="change-tel-link">Изменить</a></p>
+            <p>Email: info@example.com <a href="/user-account-put" class="change-email-link">Изменить</a></p>
+            <a href="/user-password-put" class="change-password-link">Сменить пароль</a>
+            <a href="/user-account-delete" class="delete-account-link">Удалить учетную запись</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

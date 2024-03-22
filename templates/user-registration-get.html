@@ -1,0 +1,25 @@
+{% extends 'user-autentification-base.html' %}
+
+{% block autentification %}
+<h2>Регистрация</h2>
+<form class="registration-form">
+    <div class="input-container">
+        <input type="text" id="nickname" name="nickname" required>
+        <label for="login">Никнейм</label>
+    </div>
+    <div class="input-container">
+        <input type="text" id="login" name="login" required>
+        <label for="login">Логин (номер телефона или email)</label>
+    </div>
+    <div class="input-container">
+        <input type="password" id="password" name="password" required>
+        <label for="password">Пароль</label>
+    </div>
+    <div class="input-container">
+        <input type="password" id="password" name="password" required>
+        <label for="password">Повторите пароль</label>
+    </div>
+    <button type="submit">Зарегистрироваться</button>
+</form>
+<a href="/user-login" class="register-link">Уже зарегистрированы?</a>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'company-base.html' %}
+
+{% block content %}
+<div class="dataset-card">
+    <img src="{{ url_for('static', path='/images/dataset1.png') }}" alt="Изображение датасета">
+    <h2>Название датасета</h2>
+    <p><strong>Описание:</strong> Краткое описание датасета.</p>
+    <p><strong>Количество изображений:</strong> 1000</p>
+    <p><strong>Категории:</strong> Категория 1, Категория 2, Категория 3</p>
+    <p><strong>Формат хранения:</strong> YOLO darknet</p>
+    <p><strong>Размер:</strong> 500 МБ</p>
+    <a href="#" class="download-btn">Скачать датасет</a>
+</div>
+{% endblock %}
