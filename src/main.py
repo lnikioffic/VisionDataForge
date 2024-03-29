@@ -2,15 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-import uvicorn
 
-from videoprocessor.router import router as video_router
-from auth.router import router as auth_router
-from users.router import router as users_router
+from src.videoprocessor.router import router as video_router
+from src.auth.router import router as auth_router
+from src.users.router import router as users_router
 
-from videoprocessor.utils.video_handler import create_test
-from videoprocessor.config import UPLOAD_FOLDER
-import os
+from src.videoprocessor.utils.video_handler import create_test
+from src.videoprocessor.config import UPLOAD_FOLDER
 
 
 app = FastAPI()
@@ -24,14 +22,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 
-@app.get('/')
-async def hello():
-    return {'message': 'Hello'}
-
 #Отображает раздел с датасетами на продажу (базовый шаблон)
-# @app.get("/", response_class=HTMLResponse)
-# async def main(request: Request):
-#     return templates.TemplateResponse(request=request, name="company-datasets.html")
+@app.get("/", response_class=HTMLResponse)
+async def main(request: Request):
+    return templates.TemplateResponse(request=request, name="company-datasets.html")
 
 
 #Оотображает раздел с информацией о компании
@@ -65,11 +59,11 @@ async def get_user_help(request: Request):
 
 
 
-if __name__ == '__main__':
-    # dest = os.path.join(UPLOAD_FOLDER, 'n.mp4')
-    # print(dest)
-    # create_test(dest)
-    uvicorn.run(
-        app='main:app',
-        reload=True
-    )
+# if __name__ == '__main__':
+#     dest = os.path.join(UPLOAD_FOLDER, 'n.mp4')
+#     print(dest)
+#     create_test(dest)
+#     # uvicorn.run(
+#     #     app='main:app',
+#     #     reload=True
+#     # )

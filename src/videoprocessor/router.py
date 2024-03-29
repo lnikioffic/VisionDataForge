@@ -3,8 +3,11 @@ from fastapi import APIRouter, File, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from videoprocessor.schemas import FrameData
-from videoprocessor.utils.video_handler import save_video, coordinate_adaptation, start_processing, get_fps_hendler
+
+from src.videoprocessor.schemas import FrameData
+from src.videoprocessor.utils.video_handler import (save_video, 
+                                                    coordinate_adaptation, 
+                                                    start_processing, get_fps_hendler)
 
 router = APIRouter(prefix='/video', tags=['video'])
 
@@ -12,11 +15,6 @@ router = APIRouter(prefix='/video', tags=['video'])
 router.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
-
-
-@router.post('')
-async def video_load():
-    return {'message': 'ok'}
 
 
 #Отображает раздел аннотации фото (заглушка)
