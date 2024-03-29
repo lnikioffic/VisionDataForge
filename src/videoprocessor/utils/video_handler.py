@@ -67,7 +67,7 @@ async def start_processing(path: str, frame_data: FrameData):
         fastSAM.set_prompt(frame.frame)
         fr_cop = frame.frame.copy()
         for cl in frame.names_classes:
-            cl.set_new_ROI(fastSAM)
+            cl.ROIs = fastSAM.get_prompt_box(cl.ROIs)
             for box in cl.ROIs:
                 (x, y, w, h) = [v for v in box[0]]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
@@ -84,9 +84,6 @@ class ROIsObject:
     def __init__(self, ROIs: list[list[int]], name: str):
         self.name = name
         self.ROIs = ROIs
-
-    def set_new_ROI(self, sam):
-        self.ROIs = [sam.get_prompt_box(box) for box in self.ROIs]
 
 
 class Frame:
@@ -183,45 +180,3 @@ def create_test(path):
             break
     cv2.destroyAllWindows()
     print(len(frames))
-
-
-if __name__ == '__main__':
-    path = 'VisionDataForge/data/video/n.mp4'
-    video = cv2.VideoCapture(path)
-    ret, frame = video.read()
-    frame_cop = frame.copy()
-    video.release()
-    name_classes = ['Каска', 'sd']
-
-    data = []
-    for name in name_classes:
-        bboxes = []
-        for _ in range(1):
-            bbox = cv2.selectROI(frame_cop)
-            rectangle(frame_cop, bbox[0], bbox[1], bbox[2], bbox[3])
-            bboxes.append(bbox)
-        data.append(BoundingBoxesObject(name_class=name, bboxes=bboxes))
-    cv2.destroyAllWindows()
-    trackers_classes = create_Trackers(frame, data)
-    frames = play_video(path, trackers_classes)
-
-
-    # fastSAM = NewFastSAMModel('models/FastSAM-s.pt')
-    # name_dir = os.path.splitext(path)
-    # os.mkdir(name_dir[0])
-    # path_im = name_dir[0]
-    # for frame in frames:
-    #     fastSAM.set_prompt(frame.farme)
-    #     fr_cop = frame.farme.copy()
-    #     for cl in frame.names_classes:
-    #         cl.set_new_ROI(fastSAM)
-    #         for box in cl.ROIs:
-    #             (x, y, w, h) = [v for v in box[0]]
-    #             cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
-    #             cv2.putText(fr_cop, cl.name, (x, y), 
-    #                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
-    #     cv2.imshow("test", fr_cop)
-    #     if cv2.waitKey(1) & 0xFF == ord('q'):
-    #         break
-    # cv2.destroyAllWindows()
-    # print(len(frames))
