@@ -68,8 +68,11 @@ async def start_processing(path: str, frame_data: FrameData):
         fr_cop = frame.frame.copy()
         for cl in frame.names_classes:
             cl.ROIs = fastSAM.get_prompt_box(cl.ROIs)
+            a = fastSAM.annotated_frame()
+            cv2.imshow('as', a)
+            cv2.waitKey(0)
             for box in cl.ROIs:
-                (x, y, w, h) = [v for v in box[0]]
+                (x, y, w, h) = [v for v in box]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
                 cv2.putText(fr_cop, cl.name, (x, y), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
@@ -171,7 +174,7 @@ def create_test(path):
             cv2.imshow('as', a)
             cv2.waitKey(0)
             for box in cl.ROIs:
-                (x, y, w, h) = [v for v in box[0]]
+                (x, y, w, h) = [v for v in box]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
                 cv2.putText(fr_cop, cl.name, (x, y), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)

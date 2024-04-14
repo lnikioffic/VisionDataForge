@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import supervision as sv
+#import supervision as sv
 
 from src.videoprocessor.utils.tools.contour_detector import threshold, get_filtered_bboxes_xywh
 from fastsam import FastSAM, FastSAMPrompt, FastSAMPredictor
@@ -33,25 +33,34 @@ class NewFastSAMModel():
 
 
     def _convert_image(self):
-        mask = self.mask.astype(int)
-        mask = (mask[0] * 255).astype(np.uint8)
-        mask = cv2.merge((mask, mask, mask))
+        # mask = self.mask.astype(int)
+        # mask = (mask[0] * 255).astype(np.uint8)
+        # mask = cv2.merge((mask, mask, mask))
+        mask = self.mask
+        mask = np.uint8(mask) * 255
+        mask_end = mask[0]
+        if len(mask) == 1:
+            return mask_end
+        
+        for i in range(1, len(mask)):
+            mask_end = cv2.addWeighted(mask_end, 1, mask[i], 1, 0.0)
+
         return mask
     
 
     def _get_new_bbox(self, image_mask):
-        image = cv2.cvtColor(image_mask, cv2.COLOR_RGBA2GRAY)
-        thresh_stags = threshold(image, thresh=110, mode='direct')
+        #image = cv2.cvtColor(image_mask, cv2.COLOR_RGBA2GRAY)
+        thresh_stags = threshold(image_mask, thresh=110, mode='direct')
         bbox = get_filtered_bboxes_xywh(thresh_stags, min_area_ratio=0.001)
         return bbox
     
 
-    def annotate_image(self, image: np.ndarray) -> np.ndarray:
-        xyxy = sv.mask_to_xyxy(masks=self.mask)
-        detections = sv.Detections(xyxy=xyxy, mask=self.mask)
-        #mask_annotator = sv.MaskAnnotator(color=sv.Color.blue(), color_map='index')
-        mask_annotator = sv.MaskAnnotator(color_lookup=sv.ColorLookup.INDEX)
-        return mask_annotator.annotate(scene=image.copy(), detections=detections)
+    # def annotate_image(self, image: np.ndarray) -> np.ndarray:
+    #     xyxy = sv.mask_to_xyxy(masks=self.mask)
+    #     detections = sv.Detections(xyxy=xyxy, mask=self.mask)
+    #     #mask_annotator = sv.MaskAnnotator(color=sv.Color.blue(), color_map='index')
+    #     mask_annotator = sv.MaskAnnotator(color_lookup=sv.ColorLookup.INDEX)
+    #     return mask_annotator.annotate(scene=image.copy(), detections=detections)
     
 
     def annotated_frame(self) -> np.ndarray:
