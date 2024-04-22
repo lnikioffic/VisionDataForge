@@ -2,5 +2,6 @@ fastapi[all]
 numpy
 segment-anything-fast
 setuptools
+supervision
 opencv-contrib-python
 torch
