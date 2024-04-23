@@ -14,9 +14,10 @@ async def get_fps_hendler(path: str, video: UploadFile):
     video = cv2.VideoCapture(path)
     fps = video.get(cv2.CAP_PROP_FPS)
     video.release()
-    os.remove(path)
     return fps
 
+async def del_video(path: str):
+    os.remove(path)
 
 async def save_video(video: UploadFile):
     # Генерируем уникальное имя файла
@@ -147,7 +148,7 @@ def create_test(path):
     ret, frame = video.read()
     frame_cop = frame.copy()
     video.release()
-    name_classes = ['Каска']
+    name_classes = ['Helmet']
 
     data = []
     for name in name_classes:
@@ -170,9 +171,9 @@ def create_test(path):
         fr_cop = frame.frame.copy()
         for cl in frame.names_classes:
             cl.ROIs = fastSAM.get_prompt_box(cl.ROIs)
-            a = fastSAM.annotated_frame()
-            cv2.imshow('as', a)
-            cv2.waitKey(0)
+            # a = fastSAM.annotated_frame()
+            # cv2.imshow('as', a)
+            # cv2.waitKey(0)
             for box in cl.ROIs:
                 (x, y, w, h) = [v for v in box]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)

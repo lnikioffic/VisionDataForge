@@ -66,7 +66,7 @@ videoUploadInput.addEventListener('change', async function () {
 async function getFPS(videoFile) {
     const formData = new FormData();
     formData.append("video", videoFile);
-    const response = await fetch("/video/getFPS", {
+    const response = await fetch("/video/get-FPS", {
         method: "POST", body: formData
     });
     const responseData = await response.json();
