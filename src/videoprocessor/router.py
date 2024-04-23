@@ -7,7 +7,10 @@ from fastapi.templating import Jinja2Templates
 from src.videoprocessor.schemas import FrameData
 from src.videoprocessor.utils.video_handler import (save_video, 
                                                     coordinate_adaptation, 
-                                                    start_processing, get_fps_hendler)
+                                                    start_processing, 
+                                                    get_fps_hendler,
+                                                    del_video
+                                                    )
 
 router = APIRouter(prefix='/video', tags=['video'])
 
@@ -30,10 +33,11 @@ async def get_video_annotation(request: Request):
 
 
 #АПИ запрос для получения fps видео загружаемого пользователем
-@router.post("/getFPS")
+@router.post("/get-FPS")
 async def get_FPS(video: UploadFile = File()):
     path = await save_video(video)
     fps = await get_fps_hendler(path, video)
+    await del_video(path)
     return {"fps": fps}
 
 
