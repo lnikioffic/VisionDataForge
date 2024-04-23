@@ -57,7 +57,6 @@ def get_filtered_bboxes(img, min_area_ratio):
 
 
 def get_filtered_bboxes_xywh(img, min_area_ratio):
-
     contours, hierarchy = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     # Отсортируем контуры по площади, от большего к меньшему.
     sorted_cnt = sorted(contours, key=cv2.contourArea, reverse=True)

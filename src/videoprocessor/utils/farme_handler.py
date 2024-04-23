@@ -45,7 +45,7 @@ class NewFastSAMModel():
         for i in range(1, len(mask)):
             mask_end = cv2.addWeighted(mask_end, 1, mask[i], 1, 0.0)
 
-        return mask
+        return mask_end
     
 
     def _get_new_bbox(self, image_mask):
