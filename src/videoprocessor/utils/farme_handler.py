@@ -29,7 +29,7 @@ class NewFastSAMModel():
         box_prompt = [convert_box_xywh_to_xyxy(box) for box in bboxes]
         self.mask = self.prompt_process.box_prompt(bboxes=box_prompt)
         image_mask = self._convert_image()
-        return self._get_new_bbox(image_mask)
+        return image_mask
 
 
     def _convert_image(self):
@@ -46,13 +46,6 @@ class NewFastSAMModel():
             mask_end = cv2.addWeighted(mask_end, 1, mask[i], 1, 0.0)
 
         return mask_end
-    
-
-    def _get_new_bbox(self, image_mask):
-        #image = cv2.cvtColor(image_mask, cv2.COLOR_RGBA2GRAY)
-        thresh_stags = threshold(image_mask, thresh=110, mode='direct')
-        bbox = get_filtered_bboxes_xywh(thresh_stags, min_area_ratio=0.001)
-        return bbox
     
 
     # def annotate_image(self, image: np.ndarray) -> np.ndarray:

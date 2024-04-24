@@ -8,16 +8,16 @@ from src.videoprocessor.utils.tracker import TrackersClasses, create_Trackers
 from src.videoprocessor.schemas import BoundingBoxesObject, FrameData
 from src.videoprocessor.utils.farme_handler import NewFastSAMModel
 from src.videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
+from src.videoprocessor.utils.tools.data_exporter import ExportImage, ExportObject, YoloSave
 
 
 async def get_fps_hendler(path: str, video: UploadFile):
     video = cv2.VideoCapture(path)
     fps = video.get(cv2.CAP_PROP_FPS)
     video.release()
+    os.remove(path)
     return fps
 
-async def del_video(path: str):
-    os.remove(path)
 
 async def save_video(video: UploadFile):
     # Генерируем уникальное имя файла
@@ -64,29 +64,34 @@ async def start_processing(path: str, frame_data: FrameData):
 
     fastSAM = NewFastSAMModel('models/FastSAM-s.pt')
 
-    for frame in frames:
+    images = []
+    for frame in frames: # ignore type:  Frame
         fastSAM.set_prompt(frame.frame)
         fr_cop = frame.frame.copy()
-        for cl in frame.names_classes:
-            cl.ROIs = fastSAM.get_prompt_box(cl.ROIs)
+        objects = []
+        for cl in frame.names_classes: # ignore type: ROIsObject
+            mask = fastSAM.get_prompt_box(cl.ROIs)
+            objects.append(ExportObject(mask, cl.name_class))
             # a = fastSAM.annotated_frame()
-            # cv2.imshow('as', a)
+            # cv2.imshow('as', mask)
             # cv2.waitKey(0)
-            for box in cl.ROIs:
+            for box in YoloSave.getting_coordinates(mask):
                 (x, y, w, h) = [v for v in box]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
-                cv2.putText(fr_cop, cl.name, (x, y), 
+                cv2.putText(fr_cop, cl.name_class, (x, y), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
         cv2.imshow("test", fr_cop)
+        images.append(ExportImage(frame.frame, objects))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
     print(len(frames))
+    print(len(images))
 
 
 class ROIsObject:
-    def __init__(self, ROIs: list[list[int]], name: str):
-        self.name = name
+    def __init__(self, ROIs: list[list[int]], name_class: str):
+        self.name_class = name_class
         self.ROIs = ROIs
 
 
@@ -132,7 +137,7 @@ def play_video(path: str, trackers_classes: list[TrackersClasses], frame: int = 
         if k == 0:
             roi = []
             for i in dl:
-                roi.append(ROIsObject(name=i['name'], ROIs=i['bboxes']))
+                roi.append(ROIsObject(name_class=i['name'], ROIs=i['bboxes']))
             frames.append(Frame(frame, roi))
         k += 1
         k %= 30
@@ -166,21 +171,26 @@ def create_test(path):
     # # name_dir = os.path.splitext(path)
     # # os.mkdir(name_dir[0])
     # # path_im = name_dir[0]
-    for frame in frames:
+    images = []
+    for frame in frames: # ignore type:  Frame
         fastSAM.set_prompt(frame.frame)
         fr_cop = frame.frame.copy()
-        for cl in frame.names_classes:
-            cl.ROIs = fastSAM.get_prompt_box(cl.ROIs)
+        objects = []
+        for cl in frame.names_classes: # ignore type: ROIsObject
+            mask = fastSAM.get_prompt_box(cl.ROIs)
+            objects.append(ExportObject(mask, cl.name_class))
             # a = fastSAM.annotated_frame()
-            # cv2.imshow('as', a)
+            # cv2.imshow('as', mask)
             # cv2.waitKey(0)
-            for box in cl.ROIs:
+            for box in YoloSave.getting_coordinates(mask):
                 (x, y, w, h) = [v for v in box]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
-                cv2.putText(fr_cop, cl.name, (x, y), 
+                cv2.putText(fr_cop, cl.name_class, (x, y), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
         cv2.imshow("test", fr_cop)
+        images.append(ExportImage(frame.frame, objects))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
     print(len(frames))
+    print(len(images))
