@@ -37,7 +37,6 @@ async def get_video_annotation(request: Request):
 async def get_FPS(video: UploadFile = File()):
     path = await save_video(video)
     fps = await get_fps_hendler(path, video)
-    await del_video(path)
     return {"fps": fps}
 
 
