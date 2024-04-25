@@ -9,7 +9,6 @@ from src.videoprocessor.utils.video_handler import (save_video,
                                                     coordinate_adaptation, 
                                                     start_processing, 
                                                     get_fps_hendler,
-                                                    del_video
                                                     )
 
 router = APIRouter(prefix='/video', tags=['video'])

@@ -49,14 +49,15 @@ async def coordinate_adaptation(path: str, frame_data: FrameData):
     for bbox_obj in frame_data.bboxes_objects:
         bboxes = bbox_obj.bboxes
         for bbox in bboxes:
-            bbox[0] = round(bbox[0] * ratio_height)
-            bbox[1] = round(bbox[1] * ratio_width)
-            bbox[2] = round(bbox[2] * ratio_height)
-            bbox[3] = round(bbox[3] * ratio_width)    
+            bbox[0] = round(bbox[0] * ratio_width)
+            bbox[1] = round(bbox[1] * ratio_height)
+            bbox[2] = round(bbox[2] * ratio_width)
+            bbox[3] = round(bbox[3] * ratio_height)    
 
 
 async def start_processing(path: str, frame_data: FrameData):
     video = cv2.VideoCapture(path)
+    video.set(cv2.CAP_PROP_POS_FRAMES, frame_data.current_frame)
     ret, frame = video.read()
     trackers_classes = create_Trackers(frame, frame_data.bboxes_objects)
     video.release()
