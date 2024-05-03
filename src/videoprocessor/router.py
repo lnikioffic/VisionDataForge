@@ -1,6 +1,7 @@
 import json
+from pathlib import Path
 from fastapi import APIRouter, File, Form, Request, UploadFile
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -53,6 +54,8 @@ async def upload(video: UploadFile = File(), jsonData: str = Form()):
 
     await coordinate_adaptation(path, frame_data)
 
-    await start_processing(path, frame_data)
+    file = await start_processing(path, frame_data)
 
-    return {"filename": video.filename, "jsonData": frame_data}
+    filena = Path(file).stem
+
+    return FileResponse(file, filename=Path(file).stem, media_type='multipart/form-data')

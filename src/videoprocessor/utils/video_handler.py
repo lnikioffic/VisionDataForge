@@ -6,9 +6,9 @@ from fastapi import UploadFile
 
 from src.videoprocessor.utils.tracker import TrackersClasses, create_Trackers
 from src.videoprocessor.schemas import BoundingBoxesObject, FrameData
-from src.videoprocessor.utils.farme_handler import NewFastSAMModel
+from src.videoprocessor.utils.frame_handler import NewFastSAMModel
 from src.videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
-from src.videoprocessor.utils.tools.data_exporter import ExportImage, ExportObject, YoloSave
+from src.videoprocessor.utils.tools.data_exporter import ExportImage, ExportObject, YoloSave, YoloSaveFolder
 
 
 async def get_fps_hendler(path: str, video: UploadFile):
@@ -86,8 +86,17 @@ async def start_processing(path: str, frame_data: FrameData):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
-    print(len(frames))
-    print(len(images))
+
+    return start_annotation(images, frame_data.names_class)
+
+
+
+
+def start_annotation(images: list[ExportImage], name_classes: dict):
+    folder = YoloSaveFolder(images, name_classes)
+    folder.start_creation()
+    archive = folder.create_archive()
+    return archive
 
 
 class ROIsObject:
@@ -154,12 +163,12 @@ def create_test(path):
     ret, frame = video.read()
     frame_cop = frame.copy()
     video.release()
-    name_classes = ['Helmet']
+    name_classes = ['Helmet', 'xy']
 
     data = []
     for name in name_classes:
         bboxes = []
-        for _ in range(2):
+        for _ in range(1):
             bbox = cv2.selectROI(frame_cop)
             rectangle(frame_cop, bbox[0], bbox[1], bbox[2], bbox[3])
             bboxes.append(bbox)
@@ -172,7 +181,8 @@ def create_test(path):
     # # name_dir = os.path.splitext(path)
     # # os.mkdir(name_dir[0])
     # # path_im = name_dir[0]
-    images = []
+
+    images = [] # type: ignore list[ExportImage]
     for frame in frames: # ignore type:  Frame
         fastSAM.set_prompt(frame.frame)
         fr_cop = frame.frame.copy()
@@ -189,9 +199,15 @@ def create_test(path):
                 cv2.putText(fr_cop, cl.name_class, (x, y), 
                             cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
         cv2.imshow("test", fr_cop)
-        images.append(ExportImage(frame.frame, objects))
+        images.append(ExportImage(frame.frame, objects)) # type: ignore ExportImage
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
-    print(len(frames))
-    print(len(images))
+
+
+    folder = YoloSaveFolder(images, name_classes)
+    folder.start_creation()
+    a = folder.create_archive()
+    print(a)
+    # for im in folder.images: # type: ignore ExportImage
+    #     for i in im.objects: # type: ignore ExportObject
