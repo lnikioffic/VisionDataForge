@@ -5,11 +5,12 @@ import numpy as np
 from src.videoprocessor.utils.tools.contour_detector import threshold, get_filtered_bboxes_xywh
 from fastsam import FastSAM, FastSAMPrompt, FastSAMPredictor
 from fastsam.utils import convert_box_xywh_to_xyxy
+from src.videoprocessor.config import DEVICE
 
 
 class NewFastSAMModel():
     def __init__(self, model_path: str) -> None:
-        self.device = 'cpu'
+        self.device = DEVICE
         self.model = FastSAM(model_path)
         overrides = self.model.overrides.copy()
         overrides['conf'] = 0.25
