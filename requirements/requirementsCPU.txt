@@ -4,3 +4,8 @@ segment-anything-fast
 setuptools
 opencv-contrib-python
 torch
+alembic
+asyncpg
+sqlalchemy[asyncio]
+pyjwt[crypto]
+bcrypt
