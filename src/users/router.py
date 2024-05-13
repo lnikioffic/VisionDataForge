@@ -30,10 +30,10 @@ async def get_user_account(request: Request):
     return templates.TemplateResponse(request=request, name="user-account-get.html")
 
 
-#Отображает раздел профиля с картами и счетами пользователя
-@router.get("/cards-accounts", response_class=HTMLResponse)
-async def get_user_cards_accounts(request: Request):
-    return templates.TemplateResponse(request=request, name="user-cards-accounts-get.html")
+# #Отображает раздел профиля с картами и счетами пользователя
+# @router.get("/cards-accounts", response_class=HTMLResponse)
+# async def get_user_cards_accounts(request: Request):
+#     return templates.TemplateResponse(request=request, name="user-cards-accounts-get.html")
 
 
 #Отображает раздел профиля с датасетами пользователя
@@ -63,6 +63,11 @@ async def get_user_subscriptions(request: Request):
 async def put_user_account(request: Request):
     return templates.TemplateResponse(request=request, name="user-account-put.html")
 
+#Отображает раздел для изменения пароля от аккаунта пользователя
+@router.get("/password-put", response_class=HTMLResponse)
+async def put_user_account(request: Request):
+    return templates.TemplateResponse(request=request, name="user-password-put.html")
+
 #Отображает раздел для подтверждения удаления аккаунта пользователя
 @router.get("/account-delete", response_class=HTMLResponse)
 async def delete_user_account(request: Request):
@@ -76,12 +81,12 @@ async def get_user_dataset(request: Request):
 
 
 
-#Отображает раздел для добавления карты пользователя
-@router.get("/cards-post", response_class=HTMLResponse)
-async def post_user_cards(request: Request):
-    return templates.TemplateResponse(request=request, name="user-cards-post.html")
+# #Отображает раздел для добавления карты пользователя
+# @router.get("/cards-post", response_class=HTMLResponse)
+# async def post_user_cards(request: Request):
+#     return templates.TemplateResponse(request=request, name="user-cards-post.html")
 
-#Отображает раздел для добавления счета пользователя
-@router.get("/accounts-post", response_class=HTMLResponse)
-async def post_user_accounts(request: Request):
-    return templates.TemplateResponse(request=request, name="user-accounts-post.html")
+# #Отображает раздел для добавления счета пользователя
+# @router.get("/accounts-post", response_class=HTMLResponse)
+# async def post_user_accounts(request: Request):
+#     return templates.TemplateResponse(request=request, name="user-accounts-post.html")

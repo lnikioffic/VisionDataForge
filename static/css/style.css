@@ -137,15 +137,14 @@ nav ul li a {
 .datasets-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    /* позволяет плитке изменять свою ширину в зависимости от размера контейнера */
-    grid-auto-rows: 290px;
+    grid-auto-rows: auto;
+    grid-auto-columns: auto;
     gap: 40px;
-    /* расстояние между плитками */
 }
 
 .dataset {
     padding: 0px;
-    text-align: left;
+    text-align: center;
     border-radius: 15px;
     background-color: #161616;
     color: #f2f2f2;
@@ -153,6 +152,7 @@ nav ul li a {
 
 .dataset a {
     text-decoration: none;
+    color: white;
 }
 
 .dataset h3,
@@ -162,7 +162,7 @@ p {
 
 .dataset img {
     width: 100%;
-    height: 70%;
+    height: 65%;
     border-radius: 15px 15px 0px 0px;
 }
 
@@ -171,6 +171,7 @@ p {
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
 }
 
 .search-form {
@@ -186,7 +187,7 @@ p {
     border: 1px solid #000;
     border-radius: 5px 0 0 5px;
     font-size: 16px;
-    padding: 10px 10px 10px 127px;
+    padding: 10px 10px 10px 140px;
 }
 
 .search-form select {
@@ -197,7 +198,7 @@ p {
     position: absolute;
     color: #7d7d7d;
     margin-left: 5px;
-    max-width: 120px;
+    max-width: 135px;
 }
 
 .search-form button {
@@ -904,25 +905,116 @@ input:checked+.slider:before {
 }
 
 .dataset-card {
-    width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px;
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    margin: 15px auto;
+    justify-content: center;
 }
 
-.dataset-card img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
+.image-slider {
+    width: 500px;
+    height: 500px;
+    margin-right: 20px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+}
+
+.slider-image {
+    position: absolute;
+    max-width: 100%;
+    /* Максимальная ширина картинки */
+    max-height: 100%;
+    /* Максимальная высота картинки */
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider-image img {
+    max-width: 500px;
+    /* Максимальная ширина изображения */
+    max-height: 500px;
+    /* Максимальная высота изображения */
+    width: 500px;
+    /* Максимальная ширина изображения */
+    height: 500px;
+    /* Максимальная высота изображения */
+}
+
+.slider-image.active {
+    opacity: 1;
+}
+
+.slider-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    /* Увеличиваем z-index, чтобы стрелки были поверх картинок */
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 15px;
+}
+
+.left-control {
+    left: 10px;
+}
+
+.right-control {
+    right: 10px;
+}
+
+.dataset-info {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.dataset-price {
+    text-align: center;
+}
+
+.price {
+    font-size: 1.5rem;
     margin-bottom: 10px;
 }
 
-.dataset-card h2 {
-    margin: 0 0 5px;
+.price span {
+    font-weight: bold;
 }
 
-.dataset-card p {
-    margin: 0;
-    line-height: 1.5;
+.add-to-cart-btn {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.add-to-cart-btn:hover {
+    background-color: #0056b3;
+}
+
+.download-btn {
+    background-color: #727272;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin: 0 auto;
+}
+
+.download-btn:hover {
+    background-color: #455e78;
 }
