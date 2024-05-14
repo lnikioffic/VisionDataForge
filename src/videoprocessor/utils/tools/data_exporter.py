@@ -58,9 +58,6 @@ class YoloSaveFolder():
         return f'{self.path_folder}.zip'
 
 
-
-
-
 class YoloSave():
     @classmethod
     def getting_coordinates(cls, image_mask):
@@ -77,7 +74,6 @@ class YoloSave():
 
                 file.writelines(name_class_str)
                 
-
 
     @classmethod
     def txt_frame_save(cls, image: ExportImage, path: str, names_class: dict):
@@ -146,5 +142,4 @@ def save_annotations_st(img, boxes, path):
                 yolo_annotation = [f'0 {norm_xc} {norm_yc} {norm_width} {norm_height} \n']
                 
                 f.writelines(yolo_annotation)
-
 
