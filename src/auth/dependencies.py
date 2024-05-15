@@ -144,3 +144,11 @@ async def refresh_token_jwt(user: UserRead) -> TokenInfo:
     return TokenInfo(
         access_token=access_token
     )
+
+
+async def delete_token_jwt(user: UserRead) -> TokenInfo:
+
+    return TokenInfo(
+        access_token=None,
+        refresh_token=None
+    )
