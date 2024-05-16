@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException, status, Form
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
 from src.auth.token import (
@@ -126,8 +126,8 @@ async def validate_create_user(
 
     return await create_token_jwt(user)
 
+
 async def create_token_jwt(user: UserRead) -> TokenInfo:
-    
     access_token = await create_access_token(user)
     refresh_token = await create_refresh_token(user)
 
@@ -138,7 +138,6 @@ async def create_token_jwt(user: UserRead) -> TokenInfo:
 
 
 async def refresh_token_jwt(user: UserRead) -> TokenInfo:
-    
     access_token = await create_access_token(user)
 
     return TokenInfo(
