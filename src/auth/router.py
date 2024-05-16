@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Response, HTTPException
 from fastapi.security import HTTPBearer
 
 from fastapi.templating import Jinja2Templates
@@ -47,14 +47,16 @@ async def put_user_password(request: Request):
 
 
 @router.post('/create', response_model=TokenInfo)
-async def sing_up(user: UserCreate, service: Annotated[ServiceUser, Depends()]):
+async def sing_up(response: Response, user: UserCreate, service: Annotated[ServiceUser, Depends()]):
     res = await service.create_user(user)
     token = await validate_create_user(res)
+    response.set_cookie(key="refresh_token", value=token.refresh_token)
     return token
 
 
 @router.post('/token', response_model=TokenInfo)
-async def auth(token: Annotated[str, Depends(validate_auth_user)]):
+async def auth(response: Response, token: Annotated[str, Depends(validate_auth_user)]):
+    response.set_cookie(key="refresh_token", value=token.refresh_token)
     return token
 
 
@@ -66,6 +68,12 @@ async def auth(token: Annotated[str, Depends(validate_auth_user)]):
 async def auth_refresh_jwt(user: Annotated[UserRead, Depends(get_current_auth_user_for_refresh)]):
     ref = await refresh_token_jwt(user)
     return ref
+
+
+@router.post('/logout', response_model=TokenInfo, response_model_exclude_none=True)
+async def logout(response: Response):
+    response.delete_cookie("refresh_token")
+    return TokenInfo(access_token="", refresh_token=None, token_type="Bearer")
 
 
 @router.get('/me', response_model=UserRead)

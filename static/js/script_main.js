@@ -1,3 +1,5 @@
+import { refreshToken, getCookie } from './script_register_login.js';
+
 // Переменная для видео
 let video = document.getElementById('video');
 // Контейнер для перетаскивания файлов
@@ -59,21 +61,56 @@ let videoLoaded = false;
 
 // Событие для ожидания получения fps
 videoUploadInput.addEventListener('change', async function () {
+    clearImageSlider();
     file = this.files[0];
     video.src = URL.createObjectURL(file);
     fps = await getFPS(file);
     videoLoaded = true;
 });
 
-//Функция получения FPS с бэка
+// Функция получения FPS с бэка
 async function getFPS(videoFile) {
+    const access_token = localStorage.getItem('access_token');
+    const refresh_token = getCookie('refresh_token');
+
+    if (!access_token) {
+        // Перенаправляем на страницу авторизации, если нет access_token
+        window.location.href = '/auth/login';
+        return;
+    }
+
     const formData = new FormData();
     formData.append("video", videoFile);
-    const response = await fetch("/video/get-FPS", {
-        method: "POST", body: formData
-    });
-    const responseData = await response.json();
-    return responseData.fps;
+
+    try {
+        const response = await fetch("/video/get-FPS", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            },
+            body: formData
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            return responseData.fps;
+        } else if (response.status === 401) {
+            // Access token истек, пытаемся обновить его с помощью refresh token
+            const new_access_token = await refreshToken(refresh_token);
+            if (new_access_token) {
+                // Обновили access_token, повторяем запрос
+                return await getFPS(videoFile);
+            } else {
+                // Refresh token истек или недействителен, перенаправляем на страницу авторизации
+                window.location.href = '/auth/login';
+            }
+        } else {
+            throw new Error('Ошибка при получении FPS');
+        }
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 }
 
 //Событие для загрузки видео
@@ -90,17 +127,17 @@ dropArea.addEventListener('dragleave', function (e) {
 
 //Событие для загрузки видео
 dropArea.addEventListener('drop', async function (e) {
+    clearImageSlider();
     e.preventDefault();
     dropArea.classList.remove('drag-over');
 
-    const file = e.dataTransfer.files[0];
+    file = e.dataTransfer.files[0];
 
     if (file.type.startsWith('video/')) {
         video.src = URL.createObjectURL(file);
     } else {
         alert('Пожалуйста, загрузите видео файл.');
     }
-    videoUploadInput.files[0] = file;
     fps = await getFPS(file);
     videoLoaded = true;
 });
@@ -263,7 +300,7 @@ function isStringFreeOfCyrillic(str) {
 //Событие для преобразования аннотаций выбранного для отправки размеченного кадра и его отправка на бэк
 async function sendTargetsAndVideo(currentFrame) {
     let targetIsEmpty = true;
-    let videoFile = videoUploadInput.files[0];
+    let videoFile = file;
     let formatTarget = convertFormatTargetForBackend(currentFrame);
     for (const element of formatTarget.bboxes_objects) {
         if (element.bboxes.length > 0) {
@@ -280,10 +317,35 @@ async function sendTargetsAndVideo(currentFrame) {
     formData.append("video", videoFile);
     formData.append("jsonData", jsonData);
     const response = await fetch("/video/upload", {
-        method: "POST", body: formData
+        method: "POST",
+        headers: {
+            'Authorization': `Bearer ${access_token}`
+        },
+        body: formData
     });
-    const responseData = await response.json();
-    console.log(responseData.jsonData);
+
+    if (response.ok) {
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition.match(/filename="(.*)"/)[1];
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename + ".zip";
+        a.click();
+    } else if (response.status === 401) {
+        // Access token истек, пытаемся обновить его с помощью refresh token
+        const new_access_token = await refreshToken(refresh_token);
+        if (new_access_token) {
+            // Обновили access_token, повторяем запрос
+            return await getFPS(videoFile);
+        } else {
+            // Refresh token истек или недействителен, перенаправляем на страницу авторизации
+            window.location.href = '/auth/login';
+        }
+    } else {
+        throw new Error('Ошибка загрузки видео:', response.status);
+    }
 }
 
 //Функция для конвертации формата хранения аннотаций для бэка
@@ -657,4 +719,11 @@ function resizeImageSlider(isAnnotating) {
     else {
         imageSlider.css('height', video.clientHeight + 'px');
     }
+}
+
+//Функция очистки слайдера
+function clearImageSlider() {
+    const imageSlider = $('#imageSlider');
+    finishAnnotationBtn.click();
+    imageSlider.empty(); // удаляем все дочерние элементы
 }
