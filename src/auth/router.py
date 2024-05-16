@@ -73,7 +73,7 @@ async def auth_refresh_jwt(user: Annotated[UserRead, Depends(get_current_auth_us
 @router.post('/logout', response_model=TokenInfo, response_model_exclude_none=True)
 async def logout(response: Response):
     response.delete_cookie("refresh_token")
-    return TokenInfo(access_token="", refresh_token=None, token_type="Bearer")
+    return TokenInfo(access_token="", refresh_token=None)
 
 
 @router.get('/me', response_model=UserRead)
