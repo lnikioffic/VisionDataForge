@@ -299,6 +299,8 @@ function isStringFreeOfCyrillic(str) {
 
 //Событие для преобразования аннотаций выбранного для отправки размеченного кадра и его отправка на бэк
 async function sendTargetsAndVideo(currentFrame) {
+    const access_token = localStorage.getItem("access_token");
+    const refresh_token = getCookie("refresh_token");
     let targetIsEmpty = true;
     let videoFile = file;
     let formatTarget = convertFormatTargetForBackend(currentFrame);

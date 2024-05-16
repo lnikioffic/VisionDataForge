@@ -10,7 +10,7 @@ from src.auth import utils as auth_utils
 from src.database import db
 
 
-class ServiceUser():
+class UserService():
     def __init__(self, session: AsyncSession = Depends(db.get_session)) -> None:
         self.session = session
         

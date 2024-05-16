@@ -17,7 +17,7 @@ class TrackersClasses:
         self.trackers = trackers
 
 
-def create_Trackers(frame: np.array, data: list[BoundingBoxesObject]) -> list[TrackersClasses]:
+async def create_Trackers(frame: np.array, data: list[BoundingBoxesObject]) -> list[TrackersClasses]:
     trackers_classes = []
     for c in data:
         trackers = []

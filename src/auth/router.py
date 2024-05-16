@@ -18,7 +18,7 @@ from src.auth.dependencies import (
     validate_create_user
 )
 
-from src.users.service import ServiceUser
+from src.users.service import UserService
 
 http_bearer = HTTPBearer(auto_error=False)
 router = APIRouter(prefix='/auth', tags=['Auth'], dependencies=[Depends(http_bearer)])
@@ -47,7 +47,7 @@ async def put_user_password(request: Request):
 
 
 @router.post('/create', response_model=TokenInfo)
-async def sing_up(response: Response, user: UserCreate, service: Annotated[ServiceUser, Depends()]):
+async def sing_up(response: Response, user: UserCreate, service: Annotated[UserService, Depends()]):
     res = await service.create_user(user)
     token = await validate_create_user(res)
     response.set_cookie(key="refresh_token", value=token.refresh_token)

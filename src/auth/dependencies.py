@@ -14,7 +14,7 @@ from src.users.dependencies import valid_user_id, valid_user_username
 from src.users.schemas import UserLogin, UserRead
 from src.auth.schemas import TokenInfo, AuthForm
 from src.auth import utils as auth_utils
-from src.users.service import ServiceUser
+from src.users.service import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/token')
 
@@ -44,7 +44,7 @@ async def validate_token_type(
 
 async def get_user_by_token_sub(
         payload: Annotated[dict, Depends(get_current_token_payload)],
-        service: Annotated[ServiceUser, Depends()]
+        service: Annotated[UserService, Depends()]
     ) -> UserRead:
     id: str | None = payload.get("sub")
     if user := await valid_user_id(int(id), service):
@@ -57,7 +57,7 @@ async def get_user_by_token_sub(
 
 async def get_current_auth_user(
         payload: Annotated[dict, Depends(get_current_token_payload)],
-        service: Annotated[ServiceUser, Depends()]
+        service: Annotated[UserService, Depends()]
     ) -> UserRead:
     await validate_token_type(payload=payload, token_type=ACCESS_TOKEN_TYPE)
     id: str | None = payload.get("sub")
@@ -71,7 +71,7 @@ async def get_current_auth_user(
 
 async def get_current_auth_user_for_refresh(
         payload: Annotated[dict, Depends(get_current_token_payload)],
-        service: Annotated[ServiceUser, Depends()]
+        service: Annotated[UserService, Depends()]
     ) -> UserRead:
     await validate_token_type(payload=payload, token_type=REFRESH_TOKEN_TYPE)
     id: str | None = payload.get("sub")
@@ -100,7 +100,7 @@ async def validate_auth_user(
         #data_form: Annotated[AuthForm, Depends()],
         username: Annotated[str, Form()],
         password: Annotated[str, Form()],
-        service: Annotated[ServiceUser, Depends()]
+        service: Annotated[UserService, Depends()]
     ) -> TokenInfo:
     unauthed_exc = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

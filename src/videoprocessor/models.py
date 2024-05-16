@@ -20,6 +20,9 @@ class UserDataset(Base):
     format: Mapped[str] = mapped_column(String(50))
     description: Mapped[str] = mapped_column(String(100))
     file_path: Mapped[str] = mapped_column(String(100))
+    first_frame: Mapped[str] = mapped_column(String(100))
+    second_frame: Mapped[str] = mapped_column(String(100))
+    size: Mapped[str]
 
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
 

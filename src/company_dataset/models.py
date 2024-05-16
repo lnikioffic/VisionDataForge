@@ -21,6 +21,9 @@ class CompanyDataset(Base):
     price: Mapped[int] = mapped_column(default=1, server_default='1')
     description: Mapped[str] = mapped_column(String(100))
     file_path: Mapped[str] = mapped_column(String(100))
+    first_frame: Mapped[str] = mapped_column(String(100))
+    second_frame: Mapped[str] = mapped_column(String(100))
+    size: Mapped[str]
 
     orders: Mapped[list['Order']] = relationship (
         secondary='company_dataset_order',
