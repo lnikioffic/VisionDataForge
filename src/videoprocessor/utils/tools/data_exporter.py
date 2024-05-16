@@ -20,7 +20,7 @@ class ExportImage():
         self.objects = objects
 
 
-class YoloSaveFolder():
+class YoloCreateFolder():
     def __init__(self, images: list[ExportImage], names_class: list[str]) -> None:
         self.images = images
         self.names_class = {}
@@ -44,8 +44,8 @@ class YoloSaveFolder():
         path_txt = self.lables_folder / 'image_filename'
         for i, image in enumerate(self.images):
             cv2.imwrite(f'{path_image}{i+1}.jpg', image.image)
-            YoloSave.txt_frame_save(image, f'{path_txt}{i+1}', self.names_class)
-        YoloSave.txt_class_save(self.path_folder / 'classes', self.names_class)
+            YoloSaveDark.txt_frame_save(image, f'{path_txt}{i+1}', self.names_class)
+        YoloSaveDark.txt_class_save(self.path_folder / 'classes', self.names_class)
 
 
     def create_archive(self):       
@@ -58,7 +58,7 @@ class YoloSaveFolder():
         return f'{self.path_folder}.zip'
 
 
-class YoloSave():
+class YoloSaveDark():
     @classmethod
     def getting_coordinates(cls, image_mask):
         thresh_stags = threshold(image_mask, thresh=110, mode='direct')
@@ -82,7 +82,7 @@ class YoloSave():
         img_width = image.image.shape[1]
         with open(f'{path}.txt', 'w') as file:
             for class_box in image.objects: # type: ignore ExportObject
-                class_box.coordinates = YoloSave.getting_coordinates(class_box.mask)
+                class_box.coordinates = YoloSaveDark.getting_coordinates(class_box.mask)
                 for box in class_box.coordinates:
                     x, y = box[0], box[1]
                     w, h = box[2], box[3]

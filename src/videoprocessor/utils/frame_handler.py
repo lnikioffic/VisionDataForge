@@ -8,7 +8,7 @@ from fastsam.utils import convert_box_xywh_to_xyxy
 from src.videoprocessor.config import DEVICE
 
 
-class NewFastSAMModel():
+class FastSAMModel():
     def __init__(self, model_path: str) -> None:
         self.device = DEVICE
         self.model = FastSAM(model_path)
@@ -26,7 +26,7 @@ class NewFastSAMModel():
         self.prompt_process = FastSAMPrompt(image, everything_results, device=self.device)
 
 
-    def get_prompt_box(self, bboxes):
+    def get_mask_by_box_prompt(self, bboxes):
         box_prompt = [convert_box_xywh_to_xyxy(box) for box in bboxes]
         self.mask = self.prompt_process.box_prompt(bboxes=box_prompt)
         image_mask = self._convert_image()
