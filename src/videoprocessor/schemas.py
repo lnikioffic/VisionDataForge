@@ -17,7 +17,7 @@ class FrameData(BaseModel):
     
     
 class TypeAnnotation(enum.Enum):
-    yolo_dark = 'yolo_dark'
+    yolo_dark: str = 'yolo_dark'
     
     
 class FormData(BaseModel):

@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, status
 
 from src.users.schemas import UserLogin, UserRead
-from src.users.service import ServiceUser
+from src.users.service import UserService
 
 
 error_found = HTTPException(
@@ -10,7 +10,7 @@ error_found = HTTPException(
         )
 
 
-async def valid_user_username(user_name: str, service: ServiceUser) -> UserLogin:
+async def valid_user_username(user_name: str, service: UserService) -> UserLogin:
     user = await service.get_user_by_username(user_name)
     
     if not user:
@@ -19,7 +19,7 @@ async def valid_user_username(user_name: str, service: ServiceUser) -> UserLogin
     return user
 
 
-async def valid_user_id(user_id: int, service: ServiceUser) -> UserRead | None:
+async def valid_user_id(user_id: int, service: UserService) -> UserRead | None:
     user = await service.get_user_by_id(user_id)
     
     if not user:

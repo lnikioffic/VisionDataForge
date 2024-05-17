@@ -39,7 +39,8 @@ async def create_access_token(user: UserRead) -> str:
         'user': {
             'username': user.username,
             'email': user.email,
-            'is_active': user.is_active
+            'is_active': user.is_active,
+            'is_superuser': user.is_superuser
         }
     }
 

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models import Base
 from src.order.models import Order
-from src.videoprocessor.models import UserDataset
+from src.datasets.models import Dataset
 
 
 class User(Base):
@@ -29,6 +29,6 @@ class User(Base):
         back_populates='user'
     )
 
-    datasets: Mapped[list['UserDataset']] = relationship(
+    datasets: Mapped[list['Dataset']] = relationship(
         back_populates='user'
     )
