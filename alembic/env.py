@@ -8,10 +8,9 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from src.models import Base
-from src.company_dataset.models import *
+from src.datasets.models import *
 from src.order.models import *
 from src.users.models import *
-from src.videoprocessor.models import *
 
 from src.config import settings
 

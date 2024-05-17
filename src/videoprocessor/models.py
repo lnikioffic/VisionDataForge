@@ -12,20 +12,20 @@ if TYPE_CHECKING:
 """
 Дата сеты пользователей, связаны с пользователем
 """
-class UserDataset(Base):
-    __tablename__ = 'user_dataset'
+# class UserDataset(Base):
+#     __tablename__ = 'user_dataset'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(50))
-    format: Mapped[str] = mapped_column(String(50))
-    description: Mapped[str] = mapped_column(String(100))
-    file_path: Mapped[str] = mapped_column(String(100))
-    first_frame: Mapped[str] = mapped_column(String(100))
-    second_frame: Mapped[str] = mapped_column(String(100))
-    size: Mapped[str]
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     name: Mapped[str] = mapped_column(String(50))
+#     format: Mapped[str] = mapped_column(String(50))
+#     description: Mapped[str] = mapped_column(String(100))
+#     file_path: Mapped[str] = mapped_column(String(100))
+#     first_frame: Mapped[str] = mapped_column(String(100))
+#     second_frame: Mapped[str] = mapped_column(String(100))
+#     size: Mapped[str]
 
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
+#     user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
 
-    user: Mapped['User'] = relationship(
-        back_populates='datasets'
-    )
+#     user: Mapped['User'] = relationship(
+#         back_populates='datasets'
+#     )
