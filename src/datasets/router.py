@@ -12,8 +12,7 @@ from src.datasets.schemas import TypeDatasetRead
 from src.datasets.dependencies import get_types_depend
 
 
-http_bearer = HTTPBearer(auto_error=False)
-router = APIRouter(tags=['datasets'], dependencies=[Depends(http_bearer)])
+router = APIRouter(tags=['datasets'])
 
 router.mount("/static", StaticFiles(directory="static"), name="static")
 

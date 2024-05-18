@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from src.auth.dependencies import get_current_active_auth_user, get_current_token_payload
 from src.users.schemas import UserRead
-from src.videoprocessor.schemas import FrameData, FormData, TypeAnnotation
+from src.videoprocessor.schemas import FormData, TypeAnnotation
 from src.videoprocessor.utils.video_handler import (save_video,   
                                                     get_fps_hendler,
                                                     VideoHandler,
