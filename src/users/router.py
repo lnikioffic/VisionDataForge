@@ -1,11 +1,17 @@
-from fastapi import APIRouter, Request
+from typing import Annotated
+from fastapi import APIRouter, Depends, Request
 
+from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 
+from src.auth.dependencies import get_current_active_auth_user, get_current_token_payload
+from src.users.schemas import UserRead
 
-router = APIRouter(prefix='/users', tags=['users'])
+
+http_bearer = HTTPBearer(auto_error=False)
+router = APIRouter(prefix='/users', tags=['users'], dependencies=[Depends(http_bearer), Depends(get_current_token_payload)])
 
 router.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -75,8 +81,8 @@ async def delete_user_account(request: Request):
 
 
 #Отображает раздел для карточки датасета пользователя
-@router.get("/dataset-get", response_class=HTMLResponse)
-async def get_user_dataset(request: Request):
+@router.get("/dataset/{id}", response_class=HTMLResponse)
+async def get_user_dataset(request: Request, id: int):
     return templates.TemplateResponse(request=request, name="user-dataset-get.html")
 
 
@@ -90,3 +96,12 @@ async def get_user_dataset(request: Request):
 # @router.get("/accounts-post", response_class=HTMLResponse)
 # async def post_user_accounts(request: Request):
 #     return templates.TemplateResponse(request=request, name="user-accounts-post.html")
+
+
+@router.get('/me', response_model=UserRead)
+async def get_me(
+    payload: Annotated[dict, Depends(get_current_token_payload)],
+    me: Annotated[UserRead, Depends(get_current_active_auth_user)]
+    ):
+    iat =  payload.get("iat")
+    return me
