@@ -6,14 +6,14 @@
     <div class="instrument">
         <ul>
             <li>
-                <button id="video-upload-button" class="custom-file-upload">
+                <button id="video-upload-button" class="custom-file-upload" title="Загрузить искодник (видео)">
                     <img src="{{ url_for('static', path='/images/load.png') }}" alt="Загрузить видео"
                         class="instrumentImage">
                 </button>
                 <input type="file" id="video-upload" accept="video/*" hidden>
             </li>
             <li>
-                <button id="startAnnotation">
+                <button id="startAnnotation" title="Запустить аннотирование">
                     <img src="{{ url_for('static', path='/images/startAnnotation.png') }}" class="instrumentImage">
                 </button>
             </li>
@@ -22,27 +22,32 @@
                 </select>
             </li>
             <li id="addCaseTargets">
-                <button id="addTargets">
+                <button id="addTargets" title="Добавить класс аннотирования">
                     <img src="{{ url_for('static', path='/images/addTarget.png') }}" class="instrumentImage">
                 </button>
             </li>
+            <li id="caseFormats">
+                <select name="formats" id="formats">
+                    <option value="yolo_dark">YOLO darknet</option>
+                </select>
+            </li>
             <li>
-                <button id="deleteAnnotation">
+                <button id="deleteAnnotation" title="Удалить все аннотации с кадра">
                     <img src="{{ url_for('static', path='/images/deleteAnnotation.png') }}" class="instrumentImage">
                 </button>
             </li>
             <li>
-                <button id="cancelAnnotation">
+                <button id="cancelAnnotation" title="Удалить последнюю аннотацию выбранного класса">
                     <img src="{{ url_for('static', path='/images/cancelAnnotation.png') }}" class="instrumentImage">
                 </button>
             </li>
             <li>
-                <button id="finishAnnotation">
+                <button id="finishAnnotation" title="Завершить аннотирование">
                     <img src="{{ url_for('static', path='/images/finishAnnotation.png') }}" class="instrumentImage">
                 </button>
             </li>
             <li>
-                <button id="submitAnnotation">
+                <button id="submitAnnotation" title="Создать датасет">
                     <img src="{{ url_for('static', path='/images/submitAnnotation.png') }}" class="instrumentImage">
                 </button>
             </li>

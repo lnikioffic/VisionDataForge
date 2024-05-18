@@ -301,10 +301,11 @@ function isStringFreeOfCyrillic(str) {
 async function sendTargetsAndVideo(currentFrame) {
     const access_token = localStorage.getItem("access_token");
     const refresh_token = getCookie("refresh_token");
+    const type_annotation = $("#formats").val();
     let targetIsEmpty = true;
     let videoFile = file;
-    let formatTarget = convertFormatTargetForBackend(currentFrame);
-    for (const element of formatTarget.bboxes_objects) {
+    let formatTarget = prepareFormData(currentFrame, type_annotation);
+    for (const element of formatTarget.frame_data.bboxes_objects) {
         if (element.bboxes.length > 0) {
             targetIsEmpty = false;
             break;
@@ -348,6 +349,22 @@ async function sendTargetsAndVideo(currentFrame) {
     } else {
         throw new Error('Ошибка загрузки видео:', response.status);
     }
+}
+
+function prepareFormData(currentFrame, type_annotation) {
+    const formatTarget = convertFormatTargetForBackend(currentFrame);
+    const frameData = {
+        "current_frame": currentFrame,
+        "names_class": formatTarget.names_class,
+        "frame_width": formatTarget.frame_width,
+        "frame_height": formatTarget.frame_height,
+        "bboxes_objects": formatTarget.bboxes_objects
+    };
+    const formData = {
+        "type_annotation": type_annotation,
+        "frame_data": frameData
+    };
+    return formData;
 }
 
 //Функция для конвертации формата хранения аннотаций для бэка
@@ -449,6 +466,7 @@ function addOption(className) {
             .iconselectmenu()
             .iconselectmenu("menuWidget")
             .addClass("ui-menu-icons colors");
+
     });
 
     $("#targets")
