@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, status
+from typing import Annotated
+from fastapi import Depends, HTTPException, Path, status
 
 from src.users.schemas import UserLogin, UserRead
 from src.users.service import UserService
@@ -19,7 +20,7 @@ async def valid_user_username(user_name: str, service: UserService) -> UserLogin
     return user
 
 
-async def valid_user_id(user_id: int, service: UserService) -> UserRead | None:
+async def valid_user_id(user_id: Annotated[int, Path], service: UserService) -> UserRead | None:
     user = await service.get_user_by_id(user_id)
     
     if not user:
