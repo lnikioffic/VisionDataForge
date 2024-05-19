@@ -11,7 +11,7 @@ from src.users.schemas import UserRead
 
 
 http_bearer = HTTPBearer(auto_error=False)
-router = APIRouter(prefix='/users', tags=['users'], dependencies=[Depends(http_bearer), Depends(get_current_token_payload)])
+router = APIRouter(prefix='/users', tags=['users'], dependencies=[Depends(http_bearer)])
 
 router.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -105,3 +105,11 @@ async def get_me(
     ):
     iat =  payload.get("iat")
     return me
+
+
+@router.get('/me/datasets')
+async def get_me_datasets(
+    payload: Annotated[dict, Depends(get_current_token_payload)],
+    me: Annotated[UserRead, Depends(get_current_active_auth_user)]
+    ):
+    pass
