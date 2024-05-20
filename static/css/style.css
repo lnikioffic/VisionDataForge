@@ -398,6 +398,11 @@ a {
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 15px;
 }
 
 .remove-btn-cart {
@@ -1047,4 +1052,9 @@ input:checked+.slider:before {
 
 .download-btn:hover {
     background-color: #455e78;
+}
+
+.img-cart-container img {
+    width: 150px;
+    border-radius: 5px;
 }

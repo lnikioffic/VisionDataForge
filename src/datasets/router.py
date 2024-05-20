@@ -25,6 +25,12 @@ async def get_company_datasets(request: Request):
     return templates.TemplateResponse(request=request, name="company-datasets.html")
 
 
+#Оотображает раздел с датасетами на продажу
+@router.get('/dataset/{id}', response_class=HTMLResponse)
+async def get_company_datasets(request: Request):
+    return templates.TemplateResponse(request=request, name="company-dataset.html")
+
+
 @router.get('/get-types-dataset', response_model=TypeDatasetRead)
 async def get_types_dataset(
     types: Annotated[list[TypeDatasetRead], Depends(get_types_depend)]

@@ -28,7 +28,7 @@
                     <img src="{{ url_for('static', path='/images/cart.png') }}" class="navImages" alt="Корзина"></a>
             </li>
         </ul>
-        <a href="/users/profile" class="nav-profile-icon" title="Личный кабинет">
+        <a href="/users/profile" class="nav-profile-icon" id="profile" title="Личный кабинет">
             <img src="{{ url_for('static', path='/images/profile.png') }}" class="navImages" alt="Личный кабинет"></a>
     </nav>
 
@@ -59,5 +59,9 @@
     </div>
 
 </body>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="module" src="{{ url_for('static', path='/js/script_main.js') }}"></script>
+<script type="module" src="{{ url_for('static', path='/js/script_register_login.js') }}"></script>
 
 </html>
