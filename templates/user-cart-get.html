@@ -5,30 +5,29 @@
 <div class="cart">
     <div class="datasets-cart">
         <div class="dataset-cart">
-            <h3>Название датасета 1</h3>
-            <p>Характеристики: характеристики датасета 1</p>
-            <button class="remove-btn-cart">Удалить из корзины</button>
-        </div>
-        <div class="dataset-cart">
-            <h3>Название датасета 2</h3>
-            <p>Характеристики: характеристики датасета 2</p>
-            <button class="remove-btn-cart">Удалить из корзины</button>
+            <div class="img-cart-container"><img src="{{ url_for('static', path='/images/helmets_YOLO_darknet.png') }}"
+                    alt="dataset1"></div>
+            <div class="cart-info-container">
+                <h3>Название датасета: helmets</h3>
+                <p>Цена: 0$</p>
+                <button class="remove-btn-cart">Удалить из корзины</button>
+            </div>
         </div>
         <!-- Дополнительные датасеты -->
     </div>
     <div class="order-card-cart">
         <div class="top-section-cart">
-            <button>Перейти к оформлению</button>
+            <button>Оформить заказ</button>
         </div>
         <div class="middle-section-cart">
             <h2>Ваша корзина</h2>
-            <p>Количество выбранных в корзине товаров: <span id="quantity">2</span></p>
-            <p>Ваши товары: <span id="total-price">150$</span></p>
+            <p>Количество выбранных в корзине товаров: <span id="quantity">1</span></p>
+            <p>Ваши товары: <span id="total-price">0$</span></p>
         </div>
         <div class="bottom-section-cart">
             <h2>С оформленной подпиской</h2>
-            <p>Количество выбранных в корзине товаров: <span id="quantity">2</span></p>
-            <p>Итоговая сумма: <span id="total-price">150$</span></p>
+            <p>Количество выбранных в корзине товаров: <span id="quantity">1</span></p>
+            <p>Итоговая сумма: <span id="total-price">0$</span></p>
         </div>
     </div>
 </div>
