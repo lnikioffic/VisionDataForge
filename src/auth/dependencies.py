@@ -1,5 +1,6 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException, status, Form
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
@@ -23,9 +24,10 @@ async def get_current_token_payload(token: Annotated[str, Depends(oauth2_scheme)
     try:
         payload = auth_utils.decode_jwt(token=token)
     except InvalidTokenError as ex:
-         raise HTTPException(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"invalid token error",
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     return payload
 
@@ -148,6 +150,6 @@ async def refresh_token_jwt(user: UserRead) -> TokenInfo:
 async def delete_token_jwt(user: UserRead) -> TokenInfo:
 
     return TokenInfo(
-        access_token=None,
+        access_token='',
         refresh_token=None
     )

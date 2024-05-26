@@ -57,6 +57,10 @@
         <div class="videoAnnotation">
             <video id="video" controls></video>
             <canvas id="canvas"></canvas>
+            <!-- Добавляем изображение гифки с загрузкой на страницу -->
+            <div id="loading-gif" style="display: none;">
+                <img src="{{ url_for('static', path='/images/loading.gif') }}" alt="Loading...">
+            </div>
             <div id="modal" class="hidden">
                 <form id="annotationForm">
                     <label for="className">Название класса аннотируемых объектов:</label>

@@ -5,16 +5,15 @@
       <div class="profile-icon">
         <img src="{{ url_for('static', path='/images/profile2.png') }}" alt="Profile Icon" />
       </div>
-      <div class="profile-info">
-        <p>Иванов Иван Иванович</p>
-        <p>Статус учетной записи: подтвержденная</p>
+      <div class="profile-info" id="profile-info">
+        <p id="user-name"></p>
+        <p id="user-verified"></p>
       </div>
     </div>
   </div>
   <div class="wide bottom-section">
     <div class="footer-right">
-      <p>
-        Email: info@example.com
+      <p id="user-email">
         <a href="/users/account-put" class="change-email-link">Изменить</a>
       </p>
       <a href="/users/password-put" class="change-password-link">Сменить пароль</a>
@@ -23,5 +22,4 @@
     </div>
   </div>
 </div>
-<script type="module" src="{{ url_for('static', path='/js/script_register_login.js') }}"></script>
 {% endblock %}
