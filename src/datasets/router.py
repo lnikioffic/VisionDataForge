@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, List
 from fastapi.security import HTTPBearer
 from pydantic import ValidationError
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
@@ -31,8 +31,8 @@ async def get_company_datasets(request: Request):
     return templates.TemplateResponse(request=request, name="company-dataset.html")
 
 
-@router.get('/get-types-dataset', response_model=TypeDatasetRead)
+@router.get('/get-types-dataset', response_model=list[TypeDatasetRead])
 async def get_types_dataset(
     types: Annotated[list[TypeDatasetRead], Depends(get_types_depend)]
-) -> list[TypeDatasetRead]:
+):
     return types

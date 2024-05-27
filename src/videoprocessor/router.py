@@ -10,7 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from src.auth.dependencies import get_current_active_auth_user, get_current_token_payload
 from src.users.schemas import UserRead
-from src.videoprocessor.schemas import FormData, TypeAnnotation
+from src.videoprocessor.schemas import FormData, TypeAnnotation, MetaDataVideo
 from src.videoprocessor.utils.video_handler import (save_video,   
                                                     get_fps_hendler,
                                                     VideoHandler,
@@ -40,15 +40,15 @@ async def get_video_annotation(request: Request):
 
 
 #АПИ запрос для получения fps видео загружаемого пользователем
-@router.post("/get-FPS")
+@router.post("/get-FPS", response_model=MetaDataVideo)
 async def get_FPS(
     video: Annotated[UploadFile, File()], 
     payload: Annotated[dict, Depends(get_current_token_payload)]
 ):
     path = await save_video(video)
     
-    fps = await get_fps_hendler(path)
-    return {"fps": fps}
+    meta_data = await get_fps_hendler(path)
+    return meta_data
 
 
 @router.post('/upload')

@@ -5,18 +5,21 @@ import os
 from fastapi import UploadFile
 
 from src.videoprocessor.utils.tracker import TrackersClasses, create_Trackers
-from src.videoprocessor.schemas import BoundingBoxesObject, FrameData, TypeAnnotation
+from src.videoprocessor.schemas import BoundingBoxesObject, FrameData, MetaDataVideo
 from src.videoprocessor.utils.frame_handler import FastSAMModel
 from src.videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
 from src.videoprocessor.utils.tools.data_exporter import ExportImage, ExportObject, YoloCreateFolder, YoloSaveDark
 
 
-async def get_fps_hendler(path: str):
+
+async def get_fps_hendler(path: str) -> MetaDataVideo:
     video = cv2.VideoCapture(path)
     fps = video.get(cv2.CAP_PROP_FPS)
+    total_num_frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
     video.release()
     os.remove(path)
-    return fps
+    count = total_num_frames / 30
+    return MetaDataVideo(fps=fps, count_frames=int(count))
 
 
 async def save_video(video: UploadFile):

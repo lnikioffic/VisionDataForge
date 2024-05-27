@@ -23,6 +23,10 @@ class UserLogin(UserRead):
     hashed_password: str
 
 
+class UserCreateSuperuser(UserCreate):
+    is_superuser: bool
+    
+
 class UserUpdate(UserCreate):
     username: str | None = None
     email: EmailStr | None = None
