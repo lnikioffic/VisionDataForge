@@ -22,5 +22,5 @@ class TypeDatasetService():
         stmt = select(TypeDataset)
         result: Result = await self.session.execute(stmt)
         types = result.scalars().all()
-        return types
+        return list(types)
         

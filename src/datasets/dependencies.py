@@ -13,11 +13,7 @@ error_found = HTTPException(
 
 async def get_types_depend(service: Annotated[TypeDatasetService, Depends()]) -> list[TypeDatasetRead]:
     types = await service.get_types()
-    
-    if len(types) < 1:
-        raise error_found
-        
-    return types
+    return list(types)
 
 
 async def valid_type_id(

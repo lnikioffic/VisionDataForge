@@ -16,6 +16,7 @@ class FrameData(BaseModel):
     bboxes_objects: list[BoundingBoxesObject]
     
     
+@enum.unique
 class TypeAnnotation(enum.Enum):
     yolo_dark: str = 'yolo_dark'
     
@@ -23,31 +24,8 @@ class TypeAnnotation(enum.Enum):
 class FormData(BaseModel):
     type_annotation: TypeAnnotation = Field(examples=[TypeAnnotation.yolo_dark])
     frame_data: FrameData
-    
-    
-class DatasetBase(BaseModel):
-    name: str
-    format: str
-    description: str
-    file_path: str
-    first_frame: str
-    second_frame: str
 
 
-class DatasetCreate(DatasetBase):
-    user: UserRead
-    
-    
-class DatasetRead(DatasetCreate):
-    model_config = ConfigDict(from_attributes=True)
-    
-    id: int
-    
-    
-class DabaseUpdate(DatasetBase):
-    name: str | None = None
-    format: str | None = None
-    description: str | None = None
-    file_path: str | None = None
-    first_frame: str | None = None
-    second_frame: str | None = None
+class MetaDataVideo(BaseModel):
+    fps: int
+    count_frames: int

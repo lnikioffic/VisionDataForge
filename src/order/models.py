@@ -34,7 +34,7 @@ class Order(Base):
     # )
     
     # связь через ассоциативную модель
-    dataset_details: Mapped[list['DatasetOrder']] = relationship(
+    datasets_details: Mapped[list['DatasetOrder']] = relationship(
         back_populates='order'
     )
 
@@ -49,7 +49,7 @@ class DatasetOrder(Base):
     
     # association between Assocation -> Order
     order: Mapped['Order'] = relationship(
-        back_populates='dataset_details',
+        back_populates='datasets_details',
     )
 
     # association between Assocation -> Product

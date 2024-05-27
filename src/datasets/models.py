@@ -18,8 +18,7 @@ class Dataset(Base):
     __tablename__ = 'dataset'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(50))
-    format: Mapped[str] = mapped_column(String(50))
+    name: Mapped[str] = mapped_column(String(100))
     price: Mapped[int | None]
     
     count_frames: Mapped[int]
@@ -47,11 +46,7 @@ class Dataset(Base):
     user: Mapped['User'] = relationship(
         back_populates='datasets'
     )
-        
-    user: Mapped['User'] = relationship(
-        back_populates='datasets'
-    )
-        
+ 
     orders_details: Mapped[list['DatasetOrder']] = relationship(
         back_populates='dataset'
     )
@@ -61,6 +56,6 @@ class TypeDataset(Base):
     __tablename__ = 'type_dataset'
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(50))
+    name: Mapped[str] = mapped_column(String(50), unique=True)
     
     dataset: Mapped[list['Dataset']] = relationship(back_populates='type_dataset')
