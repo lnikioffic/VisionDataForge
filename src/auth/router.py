@@ -10,10 +10,12 @@ from fastapi.responses import HTMLResponse
 from src.users.schemas import UserCreate, UserRead
 from src.auth.schemas import TokenInfo
 from src.auth.dependencies import (
+    get_current_auth_user,
     validate_auth_user, 
     get_current_active_auth_user, 
     get_current_token_payload,
     refresh_token_jwt,
+    delete_token_jwt,
     get_current_auth_user_for_refresh,
     validate_create_user
 )
@@ -71,6 +73,7 @@ async def auth_refresh_jwt(user: Annotated[UserRead, Depends(get_current_auth_us
 
 
 @router.post('/logout', response_model=TokenInfo, response_model_exclude_none=True)
-async def logout(response: Response, payload: Annotated[dict, Depends(get_current_token_payload)]):
-    response.delete_cookie("refresh_token")
-    return TokenInfo(access_token="", refresh_token=None)
+async def logout(response: Response, user: Annotated[UserRead, Depends(get_current_auth_user)]):
+    ref = await delete_token_jwt(user)
+    response.delete_cookie(key="refresh_token")
+    return ref

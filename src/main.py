@@ -1,8 +1,11 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+
+from src.users.service import UserService
 from src.videoprocessor.router import router as video_router
 from src.auth.router import router as auth_router
 from src.users.router import router as users_router
@@ -14,6 +17,12 @@ app.include_router(video_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(datasest_router)
+
+# @app.exception_handler(HTTPException)
+# async def http_exception_handler(request, exc):
+#     if exc.status_code == 401:
+#         return RedirectResponse(url="/auth/login")
+#     return {"error": str(exc)}
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")

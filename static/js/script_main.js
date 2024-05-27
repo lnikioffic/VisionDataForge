@@ -278,8 +278,10 @@ $(window).on('resize', function () {
         const canvas = $('#canvas');
         canvas.off('mouseover mouseout mousemove mousedown mouseup click dblclick');
         resizeTimer = setTimeout(function () {
-            checkSizeCanvas()
-            canvas.on('mouseover mouseout mousemove mousedown mouseup click dblclick');
+            if (!isLoading) {
+                checkSizeCanvas()
+                canvas.on('mouseover mouseout mousemove mousedown mouseup click dblclick');
+            }
         }, 300);
     }
     const imageSlider = document.getElementById('imageSlider');
@@ -297,8 +299,13 @@ function isStringFreeOfCyrillic(str) {
     return !doesStringContainCyrillic(str);
 }
 
+let isLoading = false;
+
 //Событие для преобразования аннотаций выбранного для отправки размеченного кадра и его отправка на бэк
 async function sendTargetsAndVideo(currentFrame) {
+    // Вызываем функцию для отображения гифки с загрузкой
+    showLoadingGif();
+    isLoading = true;
     const access_token = localStorage.getItem("access_token");
     const refresh_token = getCookie("refresh_token");
     const type_annotation = $("#formats").val();
@@ -327,6 +334,11 @@ async function sendTargetsAndVideo(currentFrame) {
         body: formData
     });
 
+    // Скрываем изображение гифки после получения ответа от сервера
+    hideLoadingGif();
+
+    isLoading = false;
+
     if (response.ok) {
         const contentDisposition = response.headers.get('Content-Disposition');
         const filename = contentDisposition.match(/filename="(.*)"/)[1];
@@ -349,6 +361,23 @@ async function sendTargetsAndVideo(currentFrame) {
     } else {
         throw new Error('Ошибка загрузки видео:', response.status);
     }
+}
+
+// Создаем функцию, которая будет показывать изображение гифки и скрывать блок с видео
+function showLoadingGif() {
+    const loadingGif = document.getElementById('loading-gif');
+    loadingGif.style.display = 'flex';
+    canvas.style.display = 'none';
+    imageSlider.style.display = 'none';
+}
+
+// Создаем функцию, которая будет скрывать изображение гифки
+function hideLoadingGif() {
+    const loadingGif = document.getElementById('loading-gif');
+    loadingGif.style.display = 'none';
+    imageSlider.style.display = 'block';
+    finishAnnotationBtn.click();
+    resizeCanvas();
 }
 
 function prepareFormData(currentFrame, type_annotation) {

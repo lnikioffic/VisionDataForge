@@ -1,10 +1,10 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from fastapi.security import HTTPBearer
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from src.auth.dependencies import get_current_active_auth_user, get_current_token_payload
 from src.users.schemas import UserRead
@@ -24,7 +24,6 @@ async def get_user_cart(request: Request):
     return templates.TemplateResponse(request=request, name="user-cart-get.html")
 
 
-#О_тображает раздел профиля(базовый шаблон) пользователя
 @router.get("/profile", response_class=HTMLResponse)
 async def get_user_profile(request: Request):
     return templates.TemplateResponse(request=request, name="user-account-get.html")
@@ -36,32 +35,16 @@ async def get_user_account(request: Request):
     return templates.TemplateResponse(request=request, name="user-account-get.html")
 
 
-# #Отображает раздел профиля с картами и счетами пользователя
-# @router.get("/cards-accounts", response_class=HTMLResponse)
-# async def get_user_cards_accounts(request: Request):
-#     return templates.TemplateResponse(request=request, name="user-cards-accounts-get.html")
-
-
 #Отображает раздел профиля с датасетами пользователя
 @router.get("/datasets", response_class=HTMLResponse)
 async def get_user_datasets(request: Request):
     return templates.TemplateResponse(request=request, name="user-datasets-get.html")
 
 
-
-
 #Отображает раздел профиля с настройками безопасности пользователя
 @router.get("/security", response_class=HTMLResponse)
 async def get_user_security(request: Request):
     return templates.TemplateResponse(request=request, name="user-security-get.html")
-
-#Отображает раздел профиля с подпиской пользователя
-@router.get("/subscriptions", response_class=HTMLResponse)
-async def get_user_subscriptions(request: Request):
-    return templates.TemplateResponse(request=request, name="user-subscriptions-get.html")
-
-
-
 
 
 #Отображает раздел для изменения информации об аккаунте пользователя
@@ -86,18 +69,6 @@ async def get_user_dataset(request: Request, id: int):
     return templates.TemplateResponse(request=request, name="user-dataset-get.html")
 
 
-
-# #Отображает раздел для добавления карты пользователя
-# @router.get("/cards-post", response_class=HTMLResponse)
-# async def post_user_cards(request: Request):
-#     return templates.TemplateResponse(request=request, name="user-cards-post.html")
-
-# #Отображает раздел для добавления счета пользователя
-# @router.get("/accounts-post", response_class=HTMLResponse)
-# async def post_user_accounts(request: Request):
-#     return templates.TemplateResponse(request=request, name="user-accounts-post.html")
-
-
 @router.get('/me', response_model=UserRead)
 async def get_me(
     payload: Annotated[dict, Depends(get_current_token_payload)],
@@ -113,3 +84,4 @@ async def get_me_datasets(
     me: Annotated[UserRead, Depends(get_current_active_auth_user)]
     ):
     pass
+
