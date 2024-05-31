@@ -308,7 +308,7 @@ async function sendTargetsAndVideo(currentFrame) {
     isLoading = true;
     const access_token = localStorage.getItem("access_token");
     const refresh_token = getCookie("refresh_token");
-    const type_annotation = $("#formats").val();
+    const type_annotation = parseInt($("#formats").val(), 10);
     let targetIsEmpty = true;
     let videoFile = file;
     let formatTarget = prepareFormData(currentFrame, type_annotation);
@@ -776,3 +776,23 @@ function clearImageSlider() {
     finishAnnotationBtn.click();
     imageSlider.empty(); // удаляем все дочерние элементы
 }
+
+
+async function loadFormats() {
+    const response = await fetch('/get-types-dataset');
+    if (response.ok) {
+        const formats = await response.json();
+        const formatSelect = document.getElementById('formats');
+        formats.forEach(format => {
+            const option = document.createElement('option');
+            option.value = format.id;
+            option.textContent = format.name;
+            formatSelect.appendChild(option);
+        });
+    } else {
+        console.error(`Failed to load formats: ${response.status} ${response.statusText}`);
+    }
+}
+
+// вызываем функцию при загрузке страницы
+loadFormats();
