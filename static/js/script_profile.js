@@ -87,7 +87,8 @@ const getMe = async () => {
 };
 
 const setProfileInfo = (data) => {
-    if (data) {
+    const currentUrl = window.location.href;
+    if (data && currentUrl.includes('/profile') || currentUrl.includes('/account')) {
         const userName = document.querySelector('#user-name');
         const userVerified = document.querySelector('#user-verified');
         const userEmail = document.querySelector('#user-email');
@@ -102,5 +103,5 @@ const setProfileInfo = (data) => {
     }
 };
 
-
+localStorage.setItem('isAuthCheck', 'false');
 getMe().then(setProfileInfo);

@@ -4,7 +4,7 @@
 <h1>Корзина</h1>
 <div class="cart">
     <div class="datasets-cart">
-        <div class="dataset-cart">
+        <!-- <div class="dataset-cart">
             <div class="img-cart-container"><img src="{{ url_for('static', path='/images/helmets_YOLO_darknet.png') }}"
                     alt="dataset1"></div>
             <div class="cart-info-container">
@@ -12,8 +12,7 @@
                 <p>Цена: 0$</p>
                 <button class="remove-btn-cart">Удалить из корзины</button>
             </div>
-        </div>
-        <!-- Дополнительные датасеты -->
+        </div> -->
     </div>
     <div class="order-card-cart">
         <div class="top-section-cart">
@@ -21,14 +20,10 @@
         </div>
         <div class="middle-section-cart">
             <h2>Ваша корзина</h2>
-            <p>Количество выбранных в корзине товаров: <span id="quantity">1</span></p>
-            <p>Ваши товары: <span id="total-price">0$</span></p>
-        </div>
-        <div class="bottom-section-cart">
-            <h2>С оформленной подпиской</h2>
-            <p>Количество выбранных в корзине товаров: <span id="quantity">1</span></p>
-            <p>Итоговая сумма: <span id="total-price">0$</span></p>
+            <p>Количество выбранных в корзине товаров: <span id="quantity"></span></p>
+            <p>Ваши товары: <span id="total-price"></span></p>
         </div>
     </div>
 </div>
+<script type="module" src="{{ url_for('static', path='/js/script_cart.js') }}"></script>
 {% endblock %}

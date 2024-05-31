@@ -28,7 +28,6 @@
             </li>
             <li id="caseFormats">
                 <select name="formats" id="formats">
-                    <option value="yolo_dark">YOLO darknet</option>
                 </select>
             </li>
             <li>
@@ -58,8 +57,8 @@
             <video id="video" controls></video>
             <canvas id="canvas"></canvas>
             <!-- Добавляем изображение гифки с загрузкой на страницу -->
-            <div id="loading-gif" style="display: none;">
-                <img src="{{ url_for('static', path='/images/loading.gif') }}" alt="Loading...">
+            <div id="loading-gif"">
+                <img src=" {{ url_for('static', path='/images/loading.gif' ) }}" alt="Loading...">
             </div>
             <div id="modal" class="hidden">
                 <form id="annotationForm">
