@@ -308,10 +308,10 @@ async function sendTargetsAndVideo(currentFrame) {
     isLoading = true;
     const access_token = localStorage.getItem("access_token");
     const refresh_token = getCookie("refresh_token");
-    const type_annotation = parseInt($("#formats").val(), 10);
+    const type_annotation_id = parseInt($("#formats").val(), 10);
     let targetIsEmpty = true;
     let videoFile = file;
-    let formatTarget = prepareFormData(currentFrame, type_annotation);
+    let formatTarget = prepareFormData(currentFrame, type_annotation_id);
     for (const element of formatTarget.frame_data.bboxes_objects) {
         if (element.bboxes.length > 0) {
             targetIsEmpty = false;
@@ -380,7 +380,7 @@ function hideLoadingGif() {
     resizeCanvas();
 }
 
-function prepareFormData(currentFrame, type_annotation) {
+function prepareFormData(currentFrame, type_annotation_id) {
     const formatTarget = convertFormatTargetForBackend(currentFrame);
     const frameData = {
         "current_frame": currentFrame,
@@ -390,7 +390,7 @@ function prepareFormData(currentFrame, type_annotation) {
         "bboxes_objects": formatTarget.bboxes_objects
     };
     const formData = {
-        "type_annotation": type_annotation,
+        "type_annotation_id": type_annotation_id,
         "frame_data": frameData
     };
     return formData;
