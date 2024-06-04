@@ -1,5 +1,7 @@
+import numpy as np
 from pydantic import BaseModel, ConfigDict, Field
 import enum
+from dataclasses import dataclass
 
 from src.users.schemas import UserRead
 
@@ -22,10 +24,22 @@ class TypeAnnotation(enum.Enum):
     
     
 class FormData(BaseModel):
-    type_annotation: TypeAnnotation = Field(examples=[TypeAnnotation.yolo_dark])
+    type_annotation_id: int
     frame_data: FrameData
 
 
 class MetaDataVideo(BaseModel):
     fps: int
     count_frames: int
+    
+
+@dataclass
+class ROIsObject:
+    name_class: str
+    ROIs: list[list[int]]
+    
+
+@dataclass
+class Frame:
+    frame: np.array
+    names_classes: list[ROIsObject]
