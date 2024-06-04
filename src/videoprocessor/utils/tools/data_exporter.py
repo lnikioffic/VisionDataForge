@@ -27,7 +27,7 @@ class YoloCreateFolder():
         for i, name in enumerate(names_class):
             self.names_class[name] = i
         folder_name = ''.join(names_class)[:10] if len(''.join(names_class)) > 15 else ''.join(names_class)
-        folder_name = f'{folder_name}{uuid.uuid1()}'
+        folder_name = f'{folder_name}-{uuid.uuid1()}'
         p = Path(BASE_FOLDER_DATA / folder_name)
         p.mkdir()
         self.path_folder = BASE_FOLDER_DATA / folder_name
@@ -46,6 +46,30 @@ class YoloCreateFolder():
             cv2.imwrite(f'{path_image}{i+1}.jpg', image.image)
             YoloSaveDark.txt_frame_save(image, f'{path_txt}{i+1}', self.names_class)
         YoloSaveDark.txt_class_save(self.path_folder / 'classes', self.names_class)
+        
+    
+    def create_preview(self):
+        if len(self.images) == 0:
+            return
+
+        if len(self.images) > 3:
+            image = self.images[3]
+        else:
+            image = self.images[1]
+        
+        uu = uuid.uuid4()
+        first_frame = BASE_FOLDER_DATA / f'first-{uu}.jpg'
+        second_frame = BASE_FOLDER_DATA / f'second-{uu}.jpg'
+        cv2.imwrite(first_frame, image.image)
+        for ob in image.objects: # type: ignore ExportObject
+            bboxes = YoloSaveDark.getting_coordinates(ob.mask)
+            for box in bboxes:
+                (x, y, w, h) = [int(v) for v in box]
+                cv2.rectangle(image.image, (x, y), (x + w, y + h), (0, 0, 255), 3)
+                cv2.putText(image.image, ob.name_class, (x, y), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
+        cv2.imwrite(second_frame, image.image)
+        return first_frame, second_frame
 
 
     def create_archive(self):       

@@ -23,20 +23,30 @@ class TypeDatasetUpdate(TypeDatasetBase):
 
 class DatasetBase(BaseModel):
     name: str
-    description: str
+    price: int | None
+    
+    count_frames: int
+    count_classes: int
+    
     file_path: str
     first_frame: str
     second_frame: str
+    
+    size: str
+    
+    for_sale: bool = False
 
 
 class DatasetCreate(DatasetBase):
-    user: UserRead
+    pass
     
     
-class DatasetRead(DatasetCreate):
+class DatasetRead(DatasetBase):
     model_config = ConfigDict(from_attributes=True)
     
     id: int
+    user: UserRead
+    type_dataset: TypeDatasetRead
     
     
 class DabaseUpdate(DatasetBase):

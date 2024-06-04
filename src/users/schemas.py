@@ -1,10 +1,13 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from src.datasets.schemas import DatasetRead
 
 class UserBase(BaseModel):
     username: str
     email: EmailStr
-
+    
 
 class UserRead(UserBase):
     model_config = ConfigDict(from_attributes=True)
@@ -14,7 +17,7 @@ class UserRead(UserBase):
     is_superuser: bool = False
     is_verified: bool = False
 
-
+    
 class UserCreate(UserBase):
     hashed_password: str
 

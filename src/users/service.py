@@ -7,14 +7,10 @@ from pydantic import EmailStr
 from src.users.schemas import UserLogin, UserRead, UserCreate
 from src.users.models import User
 from src.auth import utils as auth_utils
-from src.database import db
+from src.service import Service
 
 
-class UserService():
-    def __init__(self, session: AsyncSession = Depends(db.get_session)) -> None:
-        self.session = session
-        
-        
+class UserService(Service):      
     async def get_user_by_username(self, username: str) -> UserLogin | None:
         stmt = select(User).filter(User.username == username)
         result: Result = await self.session.execute(stmt)

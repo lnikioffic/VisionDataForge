@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
-from ..schemas import BoundingBoxesObject
+from dataclasses import dataclass
+from src.videoprocessor.schemas import BoundingBoxesObject
 
 
 class Tracker:
@@ -11,10 +12,10 @@ class Tracker:
         self.tracker.init(frame, bbox)
 
 
+@dataclass
 class TrackersClasses:
-    def __init__(self, class_name: str, trackers: list[Tracker]) -> None:
-        self.class_name = class_name
-        self.trackers = trackers
+    class_name: str
+    trackers: list[Tracker]
 
 
 async def create_Trackers(frame: np.array, data: list[BoundingBoxesObject]) -> list[TrackersClasses]:

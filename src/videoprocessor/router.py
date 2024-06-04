@@ -9,7 +9,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from src.auth.dependencies import get_current_active_auth_user, get_current_token_payload
+from src.datasets.dependencies import valid_type_id
+from src.datasets.service import TypeDatasetService, DatasetService
 from src.users.schemas import UserRead
+from src.datasets.schemas import TypeDatasetRead, DatasetCreate
 from src.videoprocessor.schemas import FormData, TypeAnnotation, MetaDataVideo
 from src.videoprocessor.utils.video_handler import (save_video,   
                                                     get_fps_hendler,
@@ -56,7 +59,9 @@ async def upload(
     video: Annotated[UploadFile, File()], 
     jsonData: Annotated[str, Form()],
     payload: Annotated[dict, Depends(get_current_token_payload)],
-    me: Annotated[UserRead, Depends(get_current_active_auth_user)]
+    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
+    service_type: Annotated[TypeDatasetService, Depends()],
+    service_dataset: Annotated[DatasetService, Depends()]
 ):
     try:        
         jsonData_obj = json.loads(jsonData)
@@ -67,14 +72,47 @@ async def upload(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"incorrect data",
         )
+        
+    type_annotation = await valid_type_id(form_data.type_annotation_id, service_type)
+    
+    if type_annotation is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"incorrect data",
+        )
 
+    file = await normalize_create(path, form_data, user, type_annotation, service_dataset)
+
+    return FileResponse(file, filename=Path(file).stem, media_type='multipart/form-data')
+
+
+async def normalize_create(
+    path: str, 
+    form_data: FormData, 
+    user: UserRead, 
+    type_annotation: TypeDatasetRead,
+    service: DatasetService
+):
+    
     video_hand = VideoHandler(path, form_data.frame_data)
     await video_hand.coordinate_adaptation()
     images = await video_hand.start_processing()
-
-    if form_data.type_annotation == TypeAnnotation.yolo_dark:
-        file = await start_annotation(images, video_hand.frame_data.names_class)
+    
+    if type_annotation.name == TypeAnnotation.yolo_dark.name:
+        file, first_frame, second_frame = await start_annotation(images, video_hand.frame_data.names_class)
+    
+    dataset = DatasetCreate(
+            name=''.join(form_data.frame_data.names_class), 
+            price=1, 
+            count_frames=len(images),
+            count_classes=len(form_data.frame_data.names_class),
+            file_path=file,
+            first_frame=first_frame,
+            second_frame=second_frame,
+            size=''
+        )
+    if user.is_superuser:
+        dataset.for_sale = True
+    await service.create_dataset(dataset, type_annotation.id, user.id)
         
-    filena = Path(file).stem
-
-    return FileResponse(file, filename=Path(file).stem, media_type='multipart/form-data')
+    return file

@@ -37,7 +37,9 @@ class Dataset(Base):
     
     type_dataset_id: Mapped[int] = mapped_column(ForeignKey('type_dataset.id', onupdate='CASCADE', ondelete='RESTRICT'))
 
-    type_dataset: Mapped['TypeDataset'] = relationship(back_populates='dataset')
+    type_dataset: Mapped['TypeDataset'] = relationship(
+        back_populates='datasets_for_type'
+    )
     
     # orders: Mapped[list['Order']] = relationship (
     #     secondary='company_dataset_order',
@@ -58,4 +60,4 @@ class TypeDataset(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True)
     
-    dataset: Mapped[list['Dataset']] = relationship(back_populates='type_dataset')
+    datasets_for_type: Mapped[list['Dataset']] = relationship(back_populates='type_dataset')

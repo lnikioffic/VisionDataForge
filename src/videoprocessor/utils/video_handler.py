@@ -5,7 +5,7 @@ import os
 from fastapi import UploadFile
 
 from src.videoprocessor.utils.tracker import TrackersClasses, create_Trackers
-from src.videoprocessor.schemas import BoundingBoxesObject, FrameData, MetaDataVideo
+from src.videoprocessor.schemas import BoundingBoxesObject, FrameData, MetaDataVideo, ROIsObject, Frame
 from src.videoprocessor.utils.frame_handler import FastSAMModel
 from src.videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
 from src.videoprocessor.utils.tools.data_exporter import ExportImage, ExportObject, YoloCreateFolder, YoloSaveDark
@@ -35,18 +35,6 @@ async def save_video(video: UploadFile):
 
     # Возвращаем путь до сохраненного файла
     return file_path
-
-
-class ROIsObject:
-    def __init__(self, ROIs: list[list[int]], name_class: str):
-        self.name_class = name_class
-        self.ROIs = ROIs
-
-
-class Frame:
-    def __init__(self, frame: np.array, names_classes: list[ROIsObject]):
-        self.frame = frame
-        self.names_classes = names_classes
         
 
 class VideoHandler:
@@ -145,7 +133,8 @@ async def start_annotation(images: list[ExportImage], name_classes: dict):
     folder = YoloCreateFolder(images, name_classes)
     folder.start_creation()
     archive = folder.create_archive()
-    return archive
+    first_frame, second_frame = folder.create_preview()
+    return archive, first_frame, second_frame
 
 
 def rectangle(frame, x, y, w, h):
