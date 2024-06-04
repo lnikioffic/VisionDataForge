@@ -8,8 +8,16 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from src.datasets.schemas import TypeDatasetRead
-from src.datasets.dependencies import get_types_depend
+from src.auth.dependencies import get_current_active_auth_user, get_current_token_payload
+from src.datasets.schemas import TypeDatasetRead, DatasetRead
+from src.datasets.dependencies import (
+    get_types_depend, 
+    get_dataset_for_sale_depend, 
+    get_dataset_by_user_id_depend,
+    valid_dataset_id
+)
+from src.datasets.service import DatasetService
+from src.users.schemas import UserRead
 
 
 router = APIRouter(tags=['datasets'])
@@ -36,3 +44,23 @@ async def get_types_dataset(
     types: Annotated[list[TypeDatasetRead], Depends(get_types_depend)]
 ):
     return types
+
+
+@router.get('/get-datasets', response_model=list[DatasetRead])
+async def get_datasets(dataset: Annotated[list[DatasetRead], Depends(get_dataset_for_sale_depend)]):
+    return dataset
+
+
+@router.get('/get-datasets-user', response_model=list[DatasetRead])
+async def get_datasets_user(
+    payload: Annotated[dict, Depends(get_current_token_payload)],
+    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
+    service: Annotated[DatasetService, Depends()]
+):
+    dataset = await get_dataset_by_user_id_depend(user.id, service)
+    return dataset
+
+
+@router.get('/get-dataset/{dataset_id}', response_model=DatasetRead)
+async def get_dataset(dataset: Annotated[DatasetRead, Depends(valid_dataset_id)]):
+    return dataset

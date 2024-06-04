@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 .vscode
 certs
+data/*.zip
+data/*.jpg
