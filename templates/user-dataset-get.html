@@ -8,13 +8,10 @@
             <i class="fas fa-chevron-left"></i>
         </div>
         <div class="slider-image">
-            <img src="{{ url_for('static', path='/images/dataset1.png') }}" alt="Изображение датасета 1">
+            <img src="{{ url_for('static', path=datasets[id].first_frame) }}" alt="Изображение датасета 1">
         </div>
         <div class="slider-image">
-            <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="Изображение датасета 2">
-        </div>
-        <div class="slider-image">
-            <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="Изображение датасета 2">
+            <img src="{{ url_for('static', path=datasets[id].second_frame) }}" alt="Изображение датасета 2">
         </div>
         <div class="slider-control right-control">
             <i class="fas fa-chevron-right"></i>
@@ -22,16 +19,15 @@
         <!-- Добавьте более картинок, если нужно -->
     </div>
     <div class="dataset-info">
-        <h2>Название датасета</h2>
-        <p><strong>Описание:</strong> Краткое описание датасета.</p>
-        <p><strong>Количество изображений:</strong> 1000</p>
+        <h2>Название датасета: {{ datasets[id].name }} </h2>
+        <p><strong>Описание:</strong> {{ datasets[id].name }} </p>
+        <p><strong>Количество изображений:</strong> {{ datasets[id].count_frames }}</p>
         <p><strong>Категории:</strong> Категория 1, Категория 2, Категория 3</p>
-        <p><strong>Формат хранения:</strong> YOLO darknet</p>
-        <p><strong>Размер:</strong> 500 МБ</p>
+        <p><strong>Формат хранения:</strong> {{ datasets[id].type_dataset.name }}</p>
+        <p><strong>Размер:</strong> {{ datasets[id].size }} МБ</p>
     </div>
     <div class="dataset-price">
-        <p class="price">Цена: <span>$150.</span></p>
-        <a href="#" class="add-to-cart-btn">Добавить в корзину</a>
+        <a href="#" class="add-to-cart-btn">Скачать</a>
     </div>
 </div>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">

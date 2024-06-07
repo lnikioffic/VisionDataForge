@@ -15,19 +15,36 @@
     </form>
 </div>
 <div class="datasets-grid">
+    {% for dataset in datasets %}
     <div class="dataset">
-        <a href="/dataset/1">
-            <img src="{{ url_for('static', path='/images/dataset1.png') }}" alt="dataset1">
-            <h3>Название: dataset 1</h3>
-            <p>Цена: $100</p>
+        <a href="/dataset/{{ dataset.id }}">
+            <img src="{{ url_for('static', path=dataset.first_frame) }}" alt="{{ dataset.name }}">
+            <h3>Название: {{ dataset.name }}</h3>
+            <p>Цена: {{ dataset.price }}$</p>
         </a>
     </div>
-    <div class="dataset">
-        <a href="/dataset/2">
-            <img src="{{ url_for('static', path='/images/dataset2.png') }}" alt="dataset2">
-            <h3>Название: dataset 2</h3>
-            <p>Цена: $150</p>
-        </a>
-    </div>
+    {% endfor %}
+</div>
+<div class="pages">
+    <a href="/datasets/{{ paginator.prev_num }}"
+        class="prev {% if not paginator.has_prev %} disabled {% endif %}">&laquo;</a>
+
+    {% for page in paginator.page_range %}
+    {% if page == paginator.page %}
+    <span class="current">{{ page }}</span>
+    {% elif page == 1 or page == paginator.pages or (page >= paginator.page - 2 and page <= paginator.page + 2) %} <a
+        href="/datasets/{{ page }}" class="num">{{ page }}</a>
+        {% elif page == paginator.page - 3 %}
+        <span class="dots">...</span>
+        {% elif page == paginator.page + 3 %}
+        <span class="dots">...</span>
+        {% endif %}
+        {% endfor %}
+
+        {% if paginator.has_next %}
+        <a href="/datasets/{{ paginator.next_num }}" class="next">&raquo;</a>
+        {% else %}
+        <span class="next disabled">&raquo;</span>
+        {% endif %}
 </div>
 {% endblock %}

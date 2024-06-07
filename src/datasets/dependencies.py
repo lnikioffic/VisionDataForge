@@ -38,10 +38,18 @@ async def valid_dataset_id(
 
 
 async def get_dataset_for_sale_depend(
+    page: Annotated[int, Path(ge=1)],
     service: Annotated[DatasetService, Depends()]
 ) -> list[DatasetRead]:
-    dataset = await service.get_dataset_for_sale()
+    dataset = await service.get_dataset_for_sale(page)
     return list(dataset)
+
+
+async def get_dataset_for_sale_total_depend(
+    service: Annotated[DatasetService, Depends()]
+) -> int:
+    total_count = await service.get_dataset_for_sale_total()
+    return total_count
 
 
 async def get_dataset_by_user_id_depend(
