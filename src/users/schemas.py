@@ -4,20 +4,21 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.datasets.schemas import DatasetRead
 
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr
-    
+
 
 class UserRead(UserBase):
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: int
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
 
-    
+
 class UserCreate(UserBase):
     hashed_password: str
 
@@ -28,7 +29,7 @@ class UserLogin(UserRead):
 
 class UserCreateSuperuser(UserCreate):
     is_superuser: bool
-    
+
 
 class UserUpdate(UserCreate):
     username: str | None = None

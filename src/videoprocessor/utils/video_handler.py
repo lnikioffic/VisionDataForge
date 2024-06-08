@@ -5,11 +5,21 @@ import os
 from fastapi import UploadFile
 
 from src.videoprocessor.utils.tracker import TrackersClasses, create_Trackers
-from src.videoprocessor.schemas import BoundingBoxesObject, FrameData, MetaDataVideo, ROIsObject, Frame
+from src.videoprocessor.schemas import (
+    BoundingBoxesObject,
+    FrameData,
+    MetaDataVideo,
+    ROIsObject,
+    Frame,
+)
 from src.videoprocessor.utils.frame_handler import FastSAMModel
 from src.videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
-from src.videoprocessor.utils.tools.data_exporter import ExportImage, ExportObject, YoloCreateFolder, YoloSaveDark
-
+from src.videoprocessor.utils.tools.data_exporter import (
+    ExportImage,
+    ExportObject,
+    YoloCreateFolder,
+    YoloSaveDark,
+)
 
 
 async def get_fps_hendler(path: str) -> MetaDataVideo:
@@ -25,23 +35,22 @@ async def get_fps_hendler(path: str) -> MetaDataVideo:
 async def save_video(video: UploadFile):
     # Генерируем уникальное имя файла
     # file_extension = os.path.splitext(video_file.filename)[-1]
-    # unique_filename = f"{uuid.uuid4()}{file_extension}"
+    # unique_filename = f'{uuid.uuid4()}{file_extension}'
 
     file_path = os.path.join(UPLOAD_FOLDER, video.filename)
-    
-    async with aiofiles.open(file_path, "wb") as f:
+
+    async with aiofiles.open(file_path, 'wb') as f:
         while chunk := await video.read(DEFAULT_CHUNK_SIZE):
             await f.write(chunk)
 
     # Возвращаем путь до сохраненного файла
     return file_path
-        
+
 
 class VideoHandler:
     def __init__(self, path: str, frame_data: FrameData) -> None:
         self.path: str = path
         self.frame_data: FrameData = frame_data
-
 
     async def coordinate_adaptation(self):
         video = cv2.VideoCapture(self.path)
@@ -58,8 +67,7 @@ class VideoHandler:
                 bbox[0] = round(bbox[0] * ratio_width)
                 bbox[1] = round(bbox[1] * ratio_height)
                 bbox[2] = round(bbox[2] * ratio_width)
-                bbox[3] = round(bbox[3] * ratio_height)    
-
+                bbox[3] = round(bbox[3] * ratio_height)
 
     async def start_processing(self):
         video = cv2.VideoCapture(self.path)
@@ -67,31 +75,33 @@ class VideoHandler:
         ret, frame = video.read()
         video.release()
         trackers_classes = await create_Trackers(frame, self.frame_data.bboxes_objects)
-        frames = await self.frame_selection(trackers_classes, self.frame_data.current_frame)
+        frames = await self.frame_selection(
+            trackers_classes, self.frame_data.current_frame
+        )
 
         images = await self.frame_processing(frames)
-        
+
         os.remove(self.path)
         return images
         # return start_annotation(images, self.frame_data.names_class)
-    
-    
+
     async def frame_processing(self, frames: list[Frame]) -> list[ExportImage]:
         fastSAM = FastSAMModel('models/FastSAM-s.pt')
-        
+
         images = []
-        for frame in frames: # ignore type:  Frame
+        for frame in frames:  # ignore type:  Frame
             fastSAM.set_prompt(frame.frame)
             objects = []
-            for cl in frame.names_classes: # ignore type: ROIsObject
+            for cl in frame.names_classes:  # ignore type: ROIsObject
                 mask = fastSAM.get_mask_by_box_prompt(cl.ROIs)
                 objects.append(ExportObject(mask, cl.name_class))
             images.append(ExportImage(frame.frame, objects))
-            
+
         return images
-    
-    
-    async def frame_selection(self, trackers_classes: list[TrackersClasses], frame: int = 0) -> list[Frame]:
+
+    async def frame_selection(
+        self, trackers_classes: list[TrackersClasses], frame: int = 0
+    ) -> list[Frame]:
         video = cv2.VideoCapture(self.path)
 
         second_frame_view = 0
@@ -102,7 +112,7 @@ class VideoHandler:
             ret, frame = video.read()
             if not ret:
                 break
-            
+
             list_rois = []
             if second_frame_view == 0:
                 for trackers in trackers_classes:
@@ -112,11 +122,11 @@ class VideoHandler:
                         bboxes.append(box)
                     rois_object = {'name': trackers.class_name, 'bboxes': bboxes}
                     list_rois.append(rois_object)
-            
+
             print(1)
             second_frame_view += 1
             second_frame_view &= 2
-            
+
             if number_frame_save == 0:
                 roi = []
                 for i in list_rois:
@@ -141,56 +151,63 @@ def rectangle(frame, x, y, w, h):
     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2, 1)
 
 
+def play_video(
+    path: str, trackers_classes: list[TrackersClasses], frame: int = 0
+) -> list[Frame]:
+    video = cv2.VideoCapture(path)
 
+    second_frame_view = 0
+    number_frame_save = 0
+    frames = []
+    video.set(cv2.CAP_PROP_POS_FRAMES, frame)
+    while video.isOpened():
+        ret, frame = video.read()
+        if not ret:
+            break
 
-def play_video(path: str, trackers_classes: list[TrackersClasses], frame: int = 0) -> list[Frame]:
-        video = cv2.VideoCapture(path)
+        fr_cop = frame.copy()
 
-        second_frame_view = 0
-        number_frame_save = 0
-        frames = []
-        video.set(cv2.CAP_PROP_POS_FRAMES, frame)
-        while video.isOpened():
-            ret, frame = video.read()
-            if not ret:
-                break
-            
-            fr_cop = frame.copy()
-            
-            list_rois = []
-            if second_frame_view == 0:
-                for trackers in trackers_classes:
-                    bboxes = []
-                    for tracker in trackers.trackers:
-                        ret, box = tracker.update(frame)
-                        bboxes.append(box)
-                    rois_object = {'name': trackers.class_name, 'bboxes': bboxes}
-                    list_rois.append(rois_object)
-                    
-                    for box in bboxes:
-                        (x, y, w, h) = [int(v) for v in box]
-                        cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
-                        cv2.putText(fr_cop, trackers.class_name, (x, y), 
-                                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
-                cv2.imshow("test", fr_cop)
-                
-            second_frame_view += 1
-            second_frame_view &= 2
-            
-            if number_frame_save == 0:
-                roi = []
-                for i in list_rois:
-                    roi.append(ROIsObject(name_class=i['name'], ROIs=i['bboxes']))
-                frames.append(Frame(frame, roi))
-            number_frame_save += 1
-            number_frame_save %= 30
-            
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        cv2.destroyAllWindows()
-        
-        video.release()
-        return frames
+        list_rois = []
+        if second_frame_view == 0:
+            for trackers in trackers_classes:
+                bboxes = []
+                for tracker in trackers.trackers:
+                    ret, box = tracker.update(frame)
+                    bboxes.append(box)
+                rois_object = {'name': trackers.class_name, 'bboxes': bboxes}
+                list_rois.append(rois_object)
+
+                for box in bboxes:
+                    (x, y, w, h) = [int(v) for v in box]
+                    cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
+                    cv2.putText(
+                        fr_cop,
+                        trackers.class_name,
+                        (x, y),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1,
+                        (0, 255, 255),
+                        2,
+                    )
+            cv2.imshow('test', fr_cop)
+
+        second_frame_view += 1
+        second_frame_view &= 2
+
+        if number_frame_save == 0:
+            roi = []
+            for i in list_rois:
+                roi.append(ROIsObject(name_class=i['name'], ROIs=i['bboxes']))
+            frames.append(Frame(frame, roi))
+        number_frame_save += 1
+        number_frame_save %= 30
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cv2.destroyAllWindows()
+
+    video.release()
+    return frames
 
 
 def create_test(path):
@@ -214,12 +231,12 @@ def create_test(path):
 
     fastSAM = FastSAMModel('models/FastSAM-s.pt')
 
-    images = [] # type: ignore list[ExportImage]
-    for frame in frames: # ignore type:  Frame
+    images = []  # type: ignore list[ExportImage]
+    for frame in frames:  # ignore type:  Frame
         fastSAM.set_prompt(frame.frame)
         fr_cop = frame.frame.copy()
         objects = []
-        for cl in frame.names_classes: # ignore type: ROIsObject
+        for cl in frame.names_classes:  # ignore type: ROIsObject
             mask = fastSAM.get_prompt_box(cl.ROIs)
             objects.append(ExportObject(mask, cl.name_class))
             # a = fastSAM.annotated_frame()
@@ -228,14 +245,20 @@ def create_test(path):
             for box in YoloSaveDark.getting_coordinates(mask):
                 (x, y, w, h) = [v for v in box]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
-                cv2.putText(fr_cop, cl.name_class, (x, y), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,255), 2)
-        cv2.imshow("test", fr_cop)
-        images.append(ExportImage(frame.frame, objects)) # type: ignore ExportImage
+                cv2.putText(
+                    fr_cop,
+                    cl.name_class,
+                    (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 255, 255),
+                    2,
+                )
+        cv2.imshow('test', fr_cop)
+        images.append(ExportImage(frame.frame, objects))  # type: ignore ExportImage
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
-
 
     folder = YoloCreateFolder(images, name_classes)
     folder.start_creation()

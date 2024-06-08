@@ -13,8 +13,8 @@ DEFAULT_CHUNK_SIZE = 1024 * 1024 * 50  # 50 megabytes
 
 DEVICE = 'cpu'
 if torch.cuda.is_available():
-  print('Using GPU')
-  DEVICE = 'cuda'
+    print('Using GPU')
+    DEVICE = 'cuda'
 else:
-  print('CUDA not available. Please connect to a GPU instance if possible.')
-  DEVICE = 'cpu'
+    print('CUDA not available. Please connect to a GPU instance if possible.')
+    DEVICE = 'cpu'

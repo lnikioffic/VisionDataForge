@@ -53,4 +53,4 @@ class Paginator:
             end = len(self._items)
         else:
             end = self.per_page * self.page
-        return self._items[self.per_page * (self.page - 1) + index:end]
+        return self._items[self.per_page * (self.page - 1) + index : end]

@@ -1,4 +1,4 @@
-from datetime import datetime   
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import String, func
@@ -25,10 +25,6 @@ class User(Base):
     is_superuser: Mapped[bool] = mapped_column(server_default='false', default=False)
     is_verified: Mapped[bool] = mapped_column(server_default='false', default=False)
 
-    orders_user: Mapped[list['Order']] = relationship(
-        back_populates='user'
-    )
+    orders_user: Mapped[list['Order']] = relationship(back_populates='user')
 
-    datasets: Mapped[list['Dataset']] = relationship(
-        back_populates='user'
-    )
+    datasets: Mapped[list['Dataset']] = relationship(back_populates='user')
