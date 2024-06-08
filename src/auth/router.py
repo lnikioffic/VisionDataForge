@@ -10,14 +10,13 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from src.users.schemas import UserCreate, UserRead
 from src.auth.schemas import TokenInfo
 from src.auth.dependencies import (
-    get_current_auth_user,
-    validate_auth_user, 
-    get_current_active_auth_user, 
+    validate_auth_user,
+    get_current_active_auth_user,
     get_current_token_payload,
     refresh_token_jwt,
     delete_token_jwt,
     get_current_auth_user_for_refresh,
-    validate_create_user
+    validate_create_user,
 )
 
 from src.users.service import UserService
@@ -27,61 +26,100 @@ router = APIRouter(prefix='/auth', tags=['Auth'], dependencies=[Depends(http_bea
 
 router.mount('/static', StaticFiles(directory='static'), name='static')
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory='templates')
 
 
-#Отображает раздел для авторизации пользователя
-@router.get("/login", response_class=HTMLResponse)
-async def get_user_login(request: Request, user: Annotated[UserRead, Depends(get_current_auth_user)]):
-    if not user: 
-        return templates.TemplateResponse(request=request, name="user-login-get.html")
-    return RedirectResponse(url="/users/profile")
+# Отображает раздел для авторизации пользователя
+@router.get('/login', response_class=HTMLResponse)
+async def get_user_login(
+    request: Request, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
+):
+    if not user:
+        return templates.TemplateResponse(request=request, name='user-login-get.html')
+    return RedirectResponse(url='/users/profile')
 
 
-#Отображает раздел для регистрации пользователя
-@router.get("/registration", response_class=HTMLResponse)
-async def get_user_registration(request: Request, user: Annotated[UserRead, Depends(get_current_auth_user)]):
-    if not user: 
-        return templates.TemplateResponse(request=request, name="user-registration-get.html")
-    return RedirectResponse(url="/")
+# Отображает раздел для регистрации пользователя
+@router.get('/registration', response_class=HTMLResponse)
+async def get_user_registration(
+    request: Request, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
+):
+    if not user:
+        return templates.TemplateResponse(
+            request=request, name='user-registration-get.html'
+        )
+    return RedirectResponse(url='/')
 
 
-#Отображает раздел для восстановления пароля пользователя
-@router.get("/password-put", response_class=HTMLResponse)
+# Отображает раздел для восстановления пароля пользователя
+@router.get('/password-put', response_class=HTMLResponse)
 async def put_user_password(request: Request):
-    return templates.TemplateResponse(request=request, name="user-password-put.html")
+    return templates.TemplateResponse(request=request, name='user-password-put.html')
 
 
 @router.post('/create', response_model=TokenInfo)
-async def sing_up(response: Response, user: UserCreate, service: Annotated[UserService, Depends()]):
+async def sing_up(
+    response: Response, user: UserCreate, service: Annotated[UserService, Depends()]
+):
     res = await service.create_user(user)
     token = await validate_create_user(res)
-    response.set_cookie(key="access_token", value=token.access_token, secure=True, httponly=True, max_age=3600)
-    response.set_cookie(key="refresh_token", value=token.refresh_token, secure=True, httponly=True, max_age=604800)
+    response.set_cookie(
+        key='access_token',
+        value=token.access_token,
+        secure=True,
+        httponly=True,
+        max_age=3600,
+    )
+    response.set_cookie(
+        key='refresh_token',
+        value=token.refresh_token,
+        secure=True,
+        httponly=True,
+        max_age=604800,
+    )
     return token
 
 
 @router.post('/token', response_model=TokenInfo)
 async def auth(response: Response, token: Annotated[str, Depends(validate_auth_user)]):
-    response.set_cookie(key="access_token", value=token.access_token, secure=True, httponly=True, max_age=3600)
-    response.set_cookie(key="refresh_token", value=token.refresh_token, secure=True, httponly=True, max_age=604800)
+    response.set_cookie(
+        key='access_token',
+        value=token.access_token,
+        secure=True,
+        httponly=True,
+        max_age=3600,
+    )
+    response.set_cookie(
+        key='refresh_token',
+        value=token.refresh_token,
+        secure=True,
+        httponly=True,
+        max_age=604800,
+    )
     return token
 
 
-@router.post(
-        '/refresh',
-        response_model=TokenInfo,
-        response_model_exclude_none=True
-    )
-async def auth_refresh_jwt(response: Response, user: Annotated[UserRead, Depends(get_current_auth_user_for_refresh)]):
+@router.post('/refresh', response_model=TokenInfo, response_model_exclude_none=True)
+async def auth_refresh_jwt(
+    response: Response,
+    user: Annotated[UserRead, Depends(get_current_auth_user_for_refresh)],
+):
     token = await refresh_token_jwt(user)
-    response.set_cookie(key="access_token", value=token.access_token, secure=True, httponly=True, max_age=3600)
+    response.set_cookie(
+        key='access_token',
+        value=token.access_token,
+        secure=True,
+        httponly=True,
+        max_age=3600,
+    )
     return token
 
 
 @router.post('/logout', response_model=TokenInfo, response_model_exclude_none=True)
-async def logout(response: Response, user: Annotated[UserRead, Depends(get_current_auth_user)]):
+async def logout(
+    response: Response, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
+):
     token = await delete_token_jwt(user)
-    response.delete_cookie(key="access_token")
-    response.delete_cookie(key="refresh_token")
+    response.delete_cookie(key='access_token')
+    response.delete_cookie(key='refresh_token')
     return token

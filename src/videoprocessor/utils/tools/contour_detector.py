@@ -42,7 +42,7 @@ def get_filtered_bboxes(img, min_area_ratio):
     # Отсортируем контуры по площади, от большего к меньшему.
     sorted_cnt = sorted(contours, key=cv2.contourArea, reverse=True)
     # Удаляем максимальную площадь, самый внешний контур.
-    #sorted_cnt.remove(sorted_cnt[0])
+    # sorted_cnt.remove(sorted_cnt[0])
     # Container to store filtered bboxes.
     bboxes = []
     # Область изображения.
@@ -61,7 +61,7 @@ def get_filtered_bboxes_xywh(img, min_area_ratio):
     # Отсортируем контуры по площади, от большего к меньшему.
     sorted_cnt = sorted(contours, key=cv2.contourArea, reverse=True)
     # Удаляем максимальную площадь, самый внешний контур.
-    #sorted_cnt.remove(sorted_cnt[0])
+    # sorted_cnt.remove(sorted_cnt[0])
     # Container to store filtered bboxes.
     bboxes = []
     # Область изображения.

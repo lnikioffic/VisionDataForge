@@ -17,11 +17,11 @@ class Order(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     total_price: Mapped[int | None]
     payment: Mapped[bool] = mapped_column(default=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.id', onupdate='CASCADE', ondelete='RESTRICT'))
-
-    user: Mapped['User'] = relationship(
-        back_populates='orders_user'
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey('user.id', onupdate='CASCADE', ondelete='RESTRICT')
     )
+
+    user: Mapped['User'] = relationship(back_populates='orders_user')
 
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(),
@@ -32,7 +32,7 @@ class Order(Base):
     #     secondary='company_dataset_order',
     #     back_populates='orders'
     # )
-    
+
     # связь через ассоциативную модель
     datasets_details: Mapped[list['DatasetOrder']] = relationship(
         back_populates='order'
@@ -44,9 +44,13 @@ class DatasetOrder(Base):
     __table_args__ = (UniqueConstraint('order_id', 'dataset_id', name='idx_unique'),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    order_id: Mapped[int] = mapped_column(ForeignKey('order.id', onupdate='CASCADE', ondelete='CASCADE'))
-    dataset_id: Mapped[int] = mapped_column(ForeignKey('dataset.id', onupdate='CASCADE', ondelete='RESTRICT'))
-    
+    order_id: Mapped[int] = mapped_column(
+        ForeignKey('order.id', onupdate='CASCADE', ondelete='CASCADE')
+    )
+    dataset_id: Mapped[int] = mapped_column(
+        ForeignKey('dataset.id', onupdate='CASCADE', ondelete='RESTRICT')
+    )
+
     # association between Assocation -> Order
     order: Mapped['Order'] = relationship(
         back_populates='datasets_details',
