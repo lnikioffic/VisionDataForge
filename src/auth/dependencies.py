@@ -1,8 +1,9 @@
-from typing import Annotated
-from fastapi import Depends, HTTPException, status, Form
+from typing import Annotated, Optional, Tuple
+from fastapi import Depends, HTTPException, Request, status, Form
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
+from starlette.status import HTTP_401_UNAUTHORIZED
 
 from src.auth.token import (
     create_access_token, 
@@ -19,8 +20,20 @@ from src.users.service import UserService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/token')
 
+async def get_current_token_from_cookies(request: Request) -> Optional[str]:
+        token = request.cookies.get("access_token")
+        if not token:
+            token = request.cookies.get("refresh_token")
+            if not token:
+                raise HTTPException(
+                    status_code=HTTP_401_UNAUTHORIZED,
+                    detail="Not authenticated",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        return token
 
-async def get_current_token_payload(token: Annotated[str, Depends(oauth2_scheme)]) -> UserRead:
+
+async def get_current_token_payload(token: Annotated[str, Depends(get_current_token_from_cookies)]) -> UserRead:
     try:
         payload = auth_utils.decode_jwt(token=token)
     except InvalidTokenError as ex:

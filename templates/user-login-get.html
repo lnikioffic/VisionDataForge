@@ -2,10 +2,10 @@
 
 {% block autentification %}
 <h2>Авторизация</h2>
-<form class="login-form">
+<form class="login-form" method="post" onsubmit="return login(event)">
     <div class="input-container">
-        <input type="text" id="login" name="login" required>
-        <label for="login">Логин (никнейм или email)</label>
+        <input type="text" id="username" name="username" required>
+        <label for="username">Логин (никнейм или email)</label>
     </div>
     <div class="input-container">
         <input type="password" id="password" name="password" required>

@@ -1,5 +1,3 @@
-import { refreshToken, getCookie } from './script_register_login.js';
-
 // Переменная для видео
 let video = document.getElementById('video');
 // Контейнер для перетаскивания файлов
@@ -70,40 +68,18 @@ videoUploadInput.addEventListener('change', async function () {
 
 // Функция получения FPS с бэка
 async function getFPS(videoFile) {
-    const access_token = localStorage.getItem('access_token');
-    const refresh_token = getCookie('refresh_token');
-
-    if (!access_token) {
-        // Перенаправляем на страницу авторизации, если нет access_token
-        window.location.href = '/auth/login';
-        return;
-    }
-
     const formData = new FormData();
     formData.append("video", videoFile);
-
     try {
         const response = await fetch("/video/get-FPS", {
+            credentials: 'include',
             method: "POST",
-            headers: {
-                'Authorization': `Bearer ${access_token}`
-            },
             body: formData
         });
 
         if (response.ok) {
             const responseData = await response.json();
             return responseData.fps;
-        } else if (response.status === 401) {
-            // Access token истек, пытаемся обновить его с помощью refresh token
-            const new_access_token = await refreshToken(refresh_token);
-            if (new_access_token) {
-                // Обновили access_token, повторяем запрос
-                return await getFPS(videoFile);
-            } else {
-                // Refresh token истек или недействителен, перенаправляем на страницу авторизации
-                window.location.href = '/auth/login';
-            }
         } else {
             throw new Error('Ошибка при получении FPS');
         }
@@ -306,8 +282,6 @@ async function sendTargetsAndVideo(currentFrame) {
     // Вызываем функцию для отображения гифки с загрузкой
     showLoadingGif();
     isLoading = true;
-    const access_token = localStorage.getItem("access_token");
-    const refresh_token = getCookie("refresh_token");
     const type_annotation_id = parseInt($("#formats").val(), 10);
     let targetIsEmpty = true;
     let videoFile = file;
@@ -327,10 +301,8 @@ async function sendTargetsAndVideo(currentFrame) {
     formData.append("video", videoFile);
     formData.append("jsonData", jsonData);
     const response = await fetch("/video/upload", {
+        credentials: 'include',
         method: "POST",
-        headers: {
-            'Authorization': `Bearer ${access_token}`
-        },
         body: formData
     });
 
@@ -348,16 +320,6 @@ async function sendTargetsAndVideo(currentFrame) {
         a.href = url;
         a.download = filename + ".zip";
         a.click();
-    } else if (response.status === 401) {
-        // Access token истек, пытаемся обновить его с помощью refresh token
-        const new_access_token = await refreshToken(refresh_token);
-        if (new_access_token) {
-            // Обновили access_token, повторяем запрос
-            return await getFPS(videoFile);
-        } else {
-            // Refresh token истек или недействителен, перенаправляем на страницу авторизации
-            window.location.href = '/auth/login';
-        }
     } else {
         throw new Error('Ошибка загрузки видео:', response.status);
     }

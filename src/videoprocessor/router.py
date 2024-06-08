@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from src.auth.dependencies import get_current_active_auth_user, get_current_token_payload
+from src.auth.dependencies import get_current_active_auth_user, get_current_auth_user, get_current_token_payload
 from src.datasets.dependencies import valid_type_id
 from src.datasets.service import TypeDatasetService, DatasetService
 from src.users.schemas import UserRead
@@ -38,8 +38,9 @@ async def get_photo_annotation(request: Request):
 
 #Отображает раздел с аннотацией видео
 @router.get("/annotation-video", response_class=HTMLResponse)
-async def get_video_annotation(request: Request):
-    return templates.TemplateResponse(request=request, name="annotation-video.html")
+async def get_video_annotation(request: Request, user: Annotated[UserRead, Depends(get_current_auth_user)]):
+    if user:
+        return templates.TemplateResponse(request=request, name="annotation-video.html")
 
 
 #АПИ запрос для получения fps видео загружаемого пользователем

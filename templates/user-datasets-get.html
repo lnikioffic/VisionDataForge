@@ -16,20 +16,15 @@
         </form>
     </div>
     <div class="datasets-grid">
+        {% for dataset in datasets %}
         <div class="dataset">
-            <a href="/users/dataset/1">
-                <img src="{{ url_for('static', path='/images/dataset1.png') }}" alt="dataset1">
-                <h3>Название: dataset 1</h3>
+            <a href="/users/dataset/{{ dataset.id }}">
+                <img src="{{ url_for('static', path=dataset.first_frame) }}" alt="{{ dataset.name }}">
+                <h3>Название: {{ dataset.name }}</h3>
             </a>
             <a href="#" class="download-btn">Скачать</a>
         </div>
-        <div class="dataset">
-            <a href="/users/dataset/1">
-                <img src="{{ url_for('static', path='/images/helmets_YOLO_darknet.png') }}" alt="dataset1">
-                <h3>Название: helmets</h3>
-            </a>
-            <a href="#" class="download-btn">Скачать</a>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

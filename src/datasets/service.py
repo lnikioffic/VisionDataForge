@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine import Result
-from sqlalchemy import select
+from sqlalchemy import func, select
 from fastapi import Depends
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -24,7 +24,7 @@ class TypeDatasetService(Service):
         
         
 class DatasetService(Service):
-    async def get_dataset_for_sale(self) -> list[DatasetRead]:
+    async def get_dataset_for_sale(self, page: int = 1, per_page: int = 10) -> list[DatasetRead]:
         stmt = (
             select(Dataset)
             .filter(Dataset.for_sale == True)
@@ -32,10 +32,22 @@ class DatasetService(Service):
                 selectinload(Dataset.user),
                 selectinload(Dataset.type_dataset)
             )
+            .limit(per_page)
+            .offset((page - 1) * per_page)
         )
         result: Result = await self.session.execute(stmt)
         datasets = result.scalars().all()
         return list(datasets)
+    
+
+    async def get_dataset_for_sale_total(self) -> int:
+        stmt = (
+            select(func.count(Dataset.id))  # используем func.count() для подсчета количества записей
+            .filter(Dataset.for_sale == True)
+        )
+        result: Result = await self.session.execute(stmt)
+        total_count = result.scalar()  # используем result.scalar() для получения самого значения
+        return total_count
     
     
     async def create_dataset(self, dataset: DatasetCreate, type_dataset_id, user_id) -> DatasetRead:
