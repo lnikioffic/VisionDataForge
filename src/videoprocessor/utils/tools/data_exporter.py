@@ -2,6 +2,7 @@ import cv2
 import uuid
 import shutil
 from pathlib import Path
+from typing import Protocol, Type
 
 from src.videoprocessor.utils.tools.contour_detector import (
     threshold,
@@ -23,7 +24,29 @@ class ExportImage:
         self.objects = objects
 
 
-class YoloCreateFolder:
+class TypeSave(Protocol):
+    def start_creation(self):
+        pass
+
+    def create_preview(self):
+        pass
+
+    def create_archive(self):
+        pass
+
+
+def get_type(
+    images: list[ExportImage], names_class: list[str], type_save: str = 'yolo_dark'
+) -> TypeSave:
+    '''Factory'''
+    types_saves: dict[str, Type[TypeSave]] = {
+        'yolo_dark': YoloSave,
+    }
+
+    return types_saves[type_save](images, names_class)
+
+
+class YoloSave:
     def __init__(self, images: list[ExportImage], names_class: list[str]) -> None:
         self.images = images
         self.names_class = {}
@@ -50,8 +73,8 @@ class YoloCreateFolder:
         path_txt = self.lables_folder / 'image_filename'
         for i, image in enumerate(self.images):
             cv2.imwrite(f'{path_image}{i+1}.jpg', image.image)
-            YoloSaveDark.txt_frame_save(image, f'{path_txt}{i+1}', self.names_class)
-        YoloSaveDark.txt_class_save(self.path_folder / 'classes', self.names_class)
+            AnnotationSave.txt_frame_save(image, f'{path_txt}{i+1}', self.names_class)
+        AnnotationSave.txt_class_save(self.path_folder / 'classes', self.names_class)
 
     def create_preview(self):
         if len(self.images) == 0:
@@ -65,9 +88,9 @@ class YoloCreateFolder:
         uu = uuid.uuid4()
         first_frame = BASE_FOLDER_DATA / f'first-{uu}.jpg'
         second_frame = BASE_FOLDER_DATA / f'second-{uu}.jpg'
-        cv2.imwrite(first_frame, image.image)
+        cv2.imwrite(f'{first_frame}', image.image)
         for ob in image.objects:  # type: ignore ExportObject
-            bboxes = YoloSaveDark.getting_coordinates(ob.mask)
+            bboxes = AnnotationSave.getting_coordinates(ob.mask)
             for box in bboxes:
                 (x, y, w, h) = [int(v) for v in box]
                 cv2.rectangle(image.image, (x, y), (x + w, y + h), (0, 0, 255), 3)
@@ -80,20 +103,15 @@ class YoloCreateFolder:
                     (0, 255, 255),
                     2,
                 )
-        cv2.imwrite(second_frame, image.image)
-        return first_frame, second_frame
+        cv2.imwrite(f'{second_frame}', image.image)
+        return f'{first_frame}', f'{second_frame}'
 
     def create_archive(self):
-        # Укажите путь к папке, которую нужно архивировать
-
-        # Укажите путь и имя архива
-
-        # Создайте архив
         shutil.make_archive(self.path_folder, 'zip', self.path_folder)
         return f'{self.path_folder}.zip'
 
 
-class YoloSaveDark:
+class AnnotationSave:
     @classmethod
     def getting_coordinates(cls, image_mask):
         thresh_stags = threshold(image_mask, thresh=110, mode='direct')
@@ -115,7 +133,9 @@ class YoloSaveDark:
         img_width = image.image.shape[1]
         with open(f'{path}.txt', 'w') as file:
             for class_box in image.objects:  # type: ignore ExportObject
-                class_box.coordinates = YoloSaveDark.getting_coordinates(class_box.mask)
+                class_box.coordinates = AnnotationSave.getting_coordinates(
+                    class_box.mask
+                )
                 for box in class_box.coordinates:
                     x, y = box[0], box[1]
                     w, h = box[2], box[3]
@@ -133,51 +153,3 @@ class YoloSaveDark:
                     ]
 
                     file.writelines(yolo_annotation)
-
-
-def save_annotations(img, boxes, path):
-    img_height = img.shape[0]
-    img_width = img.shape[1]
-    with open(f'{path}.txt', 'w') as f:
-        for box in boxes:
-            if len(box) > 0:
-                x, y = box[0], box[1]
-                w, h = box[2], box[3]
-
-                x_center = x + int(w / 2)
-                y_center = y + int(h / 2)
-
-                norm_xc = x_center / img_width
-                norm_yc = y_center / img_height
-                norm_width = w / img_width
-                norm_height = h / img_height
-
-                yolo_annotation = [
-                    f'0 {norm_xc} {norm_yc} {norm_width} {norm_height} \n'
-                ]
-
-                f.writelines(yolo_annotation)
-
-
-def save_annotations_st(img, boxes, path):
-    img_height = img.shape[0]
-    img_width = img.shape[1]
-    with open(f'{path}.txt', 'w') as f:
-        for box in boxes:
-            if len(box) > 0:
-                x, y = box[0][0], box[0][1]
-                w, h = box[0][2], box[0][3]
-
-                x_center = x + int(w / 2)
-                y_center = y + int(h / 2)
-
-                norm_xc = x_center / img_width
-                norm_yc = y_center / img_height
-                norm_width = w / img_width
-                norm_height = h / img_height
-
-                yolo_annotation = [
-                    f'0 {norm_xc} {norm_yc} {norm_width} {norm_height} \n'
-                ]
-
-                f.writelines(yolo_annotation)

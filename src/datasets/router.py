@@ -119,3 +119,11 @@ async def get_datasets_user(
 @router.get('/get-dataset/{dataset_id}', response_model=DatasetRead)
 async def get_dataset(dataset: Annotated[DatasetRead, Depends(valid_dataset_id)]):
     return dataset
+
+
+@router.get('/download-dataset/{dataset_id}')
+async def download_dataset(dataset: Annotated[DatasetRead, Depends(valid_dataset_id)]):
+    file = dataset.file_path
+    return FileResponse(
+        file, filename=Path(file).stem, media_type='multipart/form-data'
+    )

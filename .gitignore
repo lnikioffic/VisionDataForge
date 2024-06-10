@@ -162,3 +162,5 @@ cython_debug/
 certs
 data/*.zip
 data/*.jpg
+data/time/*.png
+im.py

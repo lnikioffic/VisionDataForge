@@ -129,10 +129,6 @@ async def validate_create_user(
 
     return await create_token_jwt(user)
 
-    '''
-    Создание токенов
-    '''
-
 
 async def create_token_jwt(user: UserRead) -> TokenInfo:
     access_token = await create_access_token(user)
