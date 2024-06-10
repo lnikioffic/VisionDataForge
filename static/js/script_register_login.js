@@ -137,18 +137,19 @@ async function logout() {
     }
 }
 
-async function refreshToken() {
-    const response = await fetch('/auth/refresh', {
-        credentials: 'include',
-        method: 'POST',
+const downloadLink = document.querySelector('#download-btn');
+
+if (downloadLink != null) {
+    downloadLink.addEventListener('click', () => {
+        downloadFile();
     });
-    const data = await response.json();
-    if (response.ok) {
-        window.location.href = '/users/profile';
-    }
-    else {
-        throw new Error(data.detail);
-    }
 }
 
-refreshToken()
+async function downloadFile() {
+    const filename = downloadLink.download;
+    const url = downloadLink.href;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+}

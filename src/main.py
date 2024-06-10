@@ -20,16 +20,29 @@ app.include_router(dataset_router)
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     if exc.status_code == 401:
-        if request.url.path == '/auth/login':
-            return templates.TemplateResponse(
-                request=request, name='user-login-get.html'
+        try:
+            redirect_response = RedirectResponse('/auth/refresh')
+            # Копирование установленных куки в RedirectResponse
+            redirect_response.set_cookie(
+                key='current_url',
+                value=request.url.path,
+                secure=True,
+                httponly=True,
+                max_age=3600,
             )
-        elif request.url.path == '/auth/registration':
-            return templates.TemplateResponse(
-                request=request, name='user-registration-get.html'
-            )
-        else:
-            return RedirectResponse(url='/auth/login')
+            # Возвращение RedirectResponse
+            return redirect_response
+        except:
+            if request.url.path == '/auth/login':
+                return templates.TemplateResponse(
+                    request=request, name='user-login-get.html'
+                )
+            elif request.url.path == '/auth/registration':
+                return templates.TemplateResponse(
+                    request=request, name='user-registration-get.html'
+                )
+            else:
+                return RedirectResponse(url='/auth/login')
     else:
         return {'detail': str(exc)}
 

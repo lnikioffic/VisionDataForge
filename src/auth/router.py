@@ -1,6 +1,7 @@
 from typing import Annotated
 import asyncio
 from fastapi import APIRouter, Form, Request, Depends, Response, HTTPException, status
+from fastapi.datastructures import Headers
 from fastapi.security import HTTPBearer
 
 from fastapi.templating import Jinja2Templates
@@ -48,7 +49,7 @@ async def get_user_registration(
         return templates.TemplateResponse(
             request=request, name='user-registration-get.html'
         )
-    return RedirectResponse(url='/')
+    return RedirectResponse(url='/users/profile')
 
 
 # Отображает раздел для восстановления пароля пользователя
@@ -99,20 +100,36 @@ async def auth(response: Response, token: Annotated[str, Depends(validate_auth_u
     return token
 
 
-@router.post('/refresh', response_model=TokenInfo, response_model_exclude_none=True)
+@router.api_route(
+    '/refresh',
+    methods=['POST', 'GET'],
+    response_model=TokenInfo,
+    response_model_exclude_none=True,
+)
 async def auth_refresh_jwt(
-    response: Response,
+    request: Request,
     user: Annotated[UserRead, Depends(get_current_auth_user_for_refresh)],
+    redirect_url: str = None,
 ):
     token = await refresh_token_jwt(user)
-    response.set_cookie(
-        key='access_token',
-        value=token.access_token,
-        secure=True,
-        httponly=True,
-        max_age=3600,
-    )
-    return token
+    redirect_url = request.cookies.get('current_url')
+    if redirect_url:
+        # Создание RedirectResponse
+        redirect_response = RedirectResponse(redirect_url)
+        # Копирование установленных куки в RedirectResponse
+        redirect_response.set_cookie(
+            key='access_token',
+            value=token.access_token,
+            secure=True,
+            httponly=True,
+            max_age=3600,
+        )
+        redirect_response.delete_cookie(key='current_url')
+        # Возвращение RedirectResponse
+        return redirect_response
+    else:
+        # Если заголовок Referer не найден, возвращаем новый токен доступа
+        return token
 
 
 @router.post('/logout', response_model=TokenInfo, response_model_exclude_none=True)

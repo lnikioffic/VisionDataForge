@@ -12,7 +12,10 @@ from src.auth.dependencies import (
     get_current_auth_user_for_refresh,
     get_current_token_payload,
 )
-from src.datasets.dependencies import get_dataset_by_user_id_depend
+from src.datasets.dependencies import (
+    get_dataset_by_user_id_depend,
+    valid_dataset_id,
+)
 from src.datasets.schemas import DatasetRead
 from src.datasets.service import DatasetService
 from src.users.schemas import UserRead
@@ -88,7 +91,9 @@ async def get_user_security(
 ):
     if user:
         return templates.TemplateResponse(
-            request=request, name='user-security-get.html'
+            request=request,
+            name='user-security-get.html',
+            context={'user': user},
         )
 
 
@@ -98,7 +103,11 @@ async def put_user_account(
     request: Request, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
 ):
     if user:
-        return templates.TemplateResponse(request=request, name='user-account-put.html')
+        return templates.TemplateResponse(
+            request=request,
+            name='user-account-put.html',
+            context={'user': user},
+        )
 
 
 # Отображает раздел для изменения пароля от аккаунта пользователя
@@ -124,19 +133,17 @@ async def delete_user_account(
 
 
 # Отображает раздел для карточки датасета пользователя
-@router.get('/dataset/{id}', response_class=HTMLResponse)
+@router.get('/dataset/{dataset_id}', response_class=HTMLResponse)
 async def get_user_dataset(
     request: Request,
-    id: int,
     user: Annotated[UserRead, Depends(get_current_active_auth_user)],
-    service: Annotated[DatasetService, Depends()],
+    dataset: Annotated[DatasetRead, Depends(valid_dataset_id)],
 ):
     if user:
-        datasets = await get_dataset_by_user_id_depend(user.id, service)
         return templates.TemplateResponse(
             request=request,
             name='user-dataset-get.html',
-            context={'datasets': datasets, 'id': id},
+            context={'dataset': dataset},
         )
 
 

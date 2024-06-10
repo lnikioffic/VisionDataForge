@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 BASE_FOLDER_DATA = Path.cwd() / 'data'
+BASE_FOLDER_DATA_IMAGES = Path.cwd() / 'static' / 'images'
 
 UPLOAD_FOLDER = Path.cwd() / 'data' / 'video'
 UPLOAD_FOLDER_TESTING = Path.cwd() / 'data' / 'video-test'
