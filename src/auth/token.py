@@ -21,7 +21,7 @@ async def create_token(
 
     jwt_payload.update(payload)
 
-    token = 'Bearer' + auth_utils.encode_jwt(
+    token = 'Bearer ' + auth_utils.encode_jwt(
         payload=jwt_payload,
         expire_minutes=expire_minutes,
         expire_timedelta=expire_timedelta,
