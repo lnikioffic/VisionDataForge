@@ -21,11 +21,12 @@ async def create_token(
 
     jwt_payload.update(payload)
 
-    return auth_utils.encode_jwt(
+    token = 'Bearer' + auth_utils.encode_jwt(
         payload=jwt_payload,
         expire_minutes=expire_minutes,
         expire_timedelta=expire_timedelta,
     )
+    return token
 
 
 async def create_access_token(user: UserRead) -> str:
@@ -39,12 +40,11 @@ async def create_access_token(user: UserRead) -> str:
         },
     }
 
-    token = 'Bearer ' + await create_token(
+    return await create_token(
         token_type=ACCESS_TOKEN_TYPE,
         payload=payload,
         expire_minutes=auth_jwt.access_token_expire_minutes,
     )
-    return token
 
 
 async def create_refresh_token(user: UserRead) -> str:
@@ -52,9 +52,8 @@ async def create_refresh_token(user: UserRead) -> str:
         'sub': str(user.id),
     }
 
-    token = 'Bearer ' + await create_token(
+    return await create_token(
         token_type=REFRESH_TOKEN_TYPE,
         payload=payload,
         expire_timedelta=timedelta(days=auth_jwt.refresh_token_expire_days),
     )
-    return token

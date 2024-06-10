@@ -17,8 +17,8 @@ from src.videoprocessor.config import UPLOAD_FOLDER, DEFAULT_CHUNK_SIZE
 from src.videoprocessor.utils.tools.data_exporter import (
     ExportImage,
     ExportObject,
-    YoloCreateFolder,
-    YoloSaveDark,
+    get_type,
+    AnnotationSave,
 )
 
 
@@ -69,23 +69,21 @@ class VideoHandler:
                 bbox[2] = round(bbox[2] * ratio_width)
                 bbox[3] = round(bbox[3] * ratio_height)
 
-    async def start_processing(self):
+    def start_processing(self):
         video = cv2.VideoCapture(self.path)
         video.set(cv2.CAP_PROP_POS_FRAMES, self.frame_data.current_frame)
         ret, frame = video.read()
         video.release()
-        trackers_classes = await create_Trackers(frame, self.frame_data.bboxes_objects)
-        frames = await self.frame_selection(
-            trackers_classes, self.frame_data.current_frame
-        )
+        trackers_classes = create_Trackers(frame, self.frame_data.bboxes_objects)
+        frames = self.frame_selection(trackers_classes, self.frame_data.current_frame)
 
-        images = await self.frame_processing(frames)
+        images = self.frame_processing(frames)
 
         os.remove(self.path)
         return images
         # return start_annotation(images, self.frame_data.names_class)
 
-    async def frame_processing(self, frames: list[Frame]) -> list[ExportImage]:
+    def frame_processing(self, frames: list[Frame]) -> list[ExportImage]:
         fastSAM = FastSAMModel('models/FastSAM-s.pt')
 
         images = []
@@ -99,7 +97,7 @@ class VideoHandler:
 
         return images
 
-    async def frame_selection(
+    def frame_selection(
         self, trackers_classes: list[TrackersClasses], frame: int = 0
     ) -> list[Frame]:
         video = cv2.VideoCapture(self.path)
@@ -139,11 +137,13 @@ class VideoHandler:
         return frames
 
 
-async def start_annotation(images: list[ExportImage], name_classes: dict):
-    folder = YoloCreateFolder(images, name_classes)
-    folder.start_creation()
-    archive = folder.create_archive()
-    first_frame, second_frame = folder.create_preview()
+async def start_annotation(
+    images: list[ExportImage], name_classes: dict, type_save: str = 'yolo_dark'
+):
+    type_save_proces = get_type(images, name_classes, type_save)
+    type_save_proces.start_creation()
+    archive = type_save_proces.create_archive()
+    first_frame, second_frame = type_save_proces.create_preview()
     return archive, first_frame, second_frame
 
 
@@ -242,7 +242,7 @@ def create_test(path):
             # a = fastSAM.annotated_frame()
             # cv2.imshow('as', mask)
             # cv2.waitKey(0)
-            for box in YoloSaveDark.getting_coordinates(mask):
+            for box in AnnotationSave.getting_coordinates(mask):
                 (x, y, w, h) = [v for v in box]
                 cv2.rectangle(fr_cop, (x, y), (x + w, y + h), (0, 0, 255), 3)
                 cv2.putText(
@@ -259,8 +259,3 @@ def create_test(path):
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     cv2.destroyAllWindows()
-
-    folder = YoloCreateFolder(images, name_classes)
-    folder.start_creation()
-    a = folder.create_archive()
-    print(a)

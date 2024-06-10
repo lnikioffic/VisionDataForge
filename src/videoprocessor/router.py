@@ -1,4 +1,5 @@
 import json
+import asyncio
 from pathlib import Path
 from typing import Annotated
 from fastapi.security import HTTPBearer
@@ -96,31 +97,28 @@ async def upload(
             detail=f'incorrect data',
         )
 
-    file = await normalize_create(
-        path, form_data, user, type_annotation, service_dataset
-    )
-
+    file = await annotation(path, form_data, user, type_annotation, service_dataset)
     return FileResponse(
         file, filename=Path(file).stem, media_type='multipart/form-data'
     )
 
 
-async def normalize_create(
+async def annotation(
     path: str,
     form_data: FormData,
     user: UserRead,
     type_annotation: TypeDatasetRead,
     service: DatasetService,
 ):
-
     video_hand = VideoHandler(path, form_data.frame_data)
     await video_hand.coordinate_adaptation()
-    images = await video_hand.start_processing()
 
-    if type_annotation.name == TypeAnnotation.yolo_dark.name:
-        file, first_frame, second_frame = await start_annotation(
-            images, video_hand.frame_data.names_class
-        )
+    coro = asyncio.to_thread(video_hand.start_processing)
+    images = await coro
+
+    file, first_frame, second_frame = await start_annotation(
+        images, video_hand.frame_data.names_class, type_annotation.name
+    )
 
     dataset = DatasetCreate(
         name=''.join(form_data.frame_data.names_class),
