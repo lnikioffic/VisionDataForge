@@ -164,3 +164,4 @@ data/*.zip
 data/*.jpg
 data/time/*.png
 im.py
+static/images/*.jpg
