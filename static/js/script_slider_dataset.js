@@ -17,11 +17,21 @@ $(document).ready(function () {
         currentSlide = (currentSlide + 1) % slides.length;
         showSlide(currentSlide);
     });
-
-    // Добавление в корзину
-    $('.add-to-cart-btn').click(function (e) {
-        e.preventDefault();
-        alert('Датасет добавлен в корзину');
-        // Добавьте ваш код для добавления датасета в корзину
-    });
 });
+
+const downloadLink = document.querySelector('#download-btn');
+
+if (downloadLink != null) {
+    downloadLink.addEventListener('click', () => {
+        downloadFile();
+    });
+}
+
+async function downloadFile() {
+    const filename = downloadLink.download;
+    const url = downloadLink.href;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+}

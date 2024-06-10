@@ -9,8 +9,17 @@ function addToCart(dataset) {
         return;
     }
 
-    // Добавляем датасет в корзину
-    cart.push(dataset);
+    // Проверяем, нет ли уже такого датасета в корзине
+    const index = cart.findIndex(item => item.id === dataset.id);
+    if (index !== -1) {
+        alert("Этот датасет уже добавлен в корзину");
+        return;
+    }
+    else {
+        // Добавляем датасет в корзину
+        cart.push(dataset);
+        alert('Датасет добавлен в корзину');
+    }
 
     // сохраняем корзину в localStorage
     saveCartToLocalStorage();
@@ -19,39 +28,116 @@ function addToCart(dataset) {
     updateCart();
 }
 
-// Функция для удаления датасета из корзины
-function removeFromCart(index) {
-    // Удаляем датасет из корзины
-    cart.splice(index, 1);
-    saveCartToLocalStorage(); // сохраняем корзину в localStorage
-    updateCart();
+function updateDeleteBtn(removeSelectedBtn) {
+    // Функция для удаления датасета из корзины
+    removeSelectedBtn.addEventListener('click', function () {
+        // Находим все выбранные чекбоксы
+        const selectedCheckboxes = document.querySelectorAll('.dataset-checkbox:checked');
+
+        // Перебираем выбранные чекбоксы и удаляем соответствующие датасеты из корзины
+        const indicesToRemove = [];
+        selectedCheckboxes.forEach(checkbox => {
+            const index = parseFloat(checkbox.dataset.index);
+            indicesToRemove.push(index);
+        });
+
+        // Удаляем датасеты из корзины в обратном порядке, чтобы избежать проблем с индексами
+        for (let i = indicesToRemove.length - 1; i >= 0; i--) {
+            cart.splice(indicesToRemove[i], 1);
+        }
+
+        // Сохраняем корзину в localStorage
+        saveCartToLocalStorage();
+
+        // Обновляем корзину на странице
+        updateCart();
+    });
+}
+
+function updateCheckboxes(selectAllCheckbox, datasetCheckboxes, removeSelectedBtn) {
+    // Добавляем обработчик события на чекбоксы датасетов, чтобы обновлять значение чекбокса "Выбрать все"
+    datasetCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            // Обновляем значение чекбокса "Выбрать все"
+            selectAllCheckbox.checked = datasetCheckboxes.length === Array.from(datasetCheckboxes).filter(cb => cb.checked).length;
+
+            // Показываем или скрываем кнопку "Удалить выбранные" в зависимости от того, выбран ли хотя бы один чекбокс
+            if (Array.from(datasetCheckboxes).some(cb => cb.checked)) {
+                removeSelectedBtn.style.display = 'block';
+            } else {
+                removeSelectedBtn.style.display = 'none';
+            }
+        });
+    });
+
+    // Добавляем обработчик события на чекбокс "Выбрать все"
+    selectAllCheckbox.addEventListener('change', function () {
+        // Перебираем чекбоксы датасетов и устанавливаем им соответствующее значение
+        datasetCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+
+        // Показываем или скрываем кнопку "Удалить выбранные" в зависимости от того, выбран ли хотя бы один чекбокс
+        if (Array.from(datasetCheckboxes).some(cb => cb.checked)) {
+            removeSelectedBtn.style.display = 'block';
+        } else {
+            removeSelectedBtn.style.display = 'none';
+        }
+    });
 }
 
 // Функция для обновления корзины
 function updateCart() {
     // Обнуляем корзину
     let cartContainer = document.querySelector(".datasets-cart");
-    cartContainer.innerHTML = "";
+    if (cartContainer != null) {
+        // Создаем элемент .datasets-func, если он отсутствует в корзине
+        const datasetsFunc = document.querySelector('.datasets-func') || document.createElement('div');
+        datasetsFunc.className = 'datasets-func';
+        datasetsFunc.innerHTML = `
+            <label><input type="checkbox">Выбрать все</label>
+            <button class="remove-selected-btn">Удалить выбранные</button>
+        `;
 
-    // Перебираем датасеты в корзине и добавляем их в корзину на страницу
-    cart.forEach((dataset, index) => {
-        cartContainer.innerHTML += `
-      <div class="dataset-cart">
-        <div class="img-cart-container"><img src="${dataset.image}" alt="${dataset.name}"></div>
-        <div class="cart-info-container">
-          <h3>Название датасета: ${dataset.name}</h3>
-          <p>Цена: ${dataset.price}$</p>
-          <button class="remove-btn-cart" onclick="removeFromCart(${index})">Удалить из корзины</button>
-        </div>
-      </div>
-    `;
-    });
+        // Удаляем все блоки .dataset-cart и .datasets-func, если они есть в корзине
+        cartContainer.querySelectorAll('.dataset-cart, .datasets-func').forEach(dataset => {
+            dataset.remove();
+        });
 
-    // Обновляем количество и общую сумму в корзине
-    let quantity = document.querySelector("#quantity");
-    let totalPrice = document.querySelector("#total-price");
-    quantity.textContent = cart.length;
-    totalPrice.textContent = cart.reduce((acc, dataset) => acc + dataset.price, 0) + "$";
+        // Вставляем .datasets-func в начало .datasets-cart
+        cartContainer.insertBefore(datasetsFunc, cartContainer.firstChild);
+
+        // Перебираем датасеты в корзине и добавляем их в корзину на страницу
+        cart.forEach((dataset, index) => {
+            cartContainer.innerHTML += `
+          <div class="dataset-cart">
+            <div class="cart-info-container"><input type="checkbox" class="dataset-checkbox" data-index="${index}"></div>
+            <a href="/dataset/${dataset.id}" style="text-decoration: none; color: black;">
+            <div class="img-cart-container"><img src="/static/${dataset.first_frame}" alt="${dataset.name}"></div>
+            <div class="cart-info-container">
+              <h3>Название датасета: ${dataset.name}</h3>
+              <p>Цена: ${dataset.price}$</p></a>
+            </div>
+          </div>`;
+        });
+
+        // Обновляем количество и общую сумму в корзине
+        let quantity = document.querySelector("#quantity");
+        let totalPrice = document.querySelector("#total-price");
+        quantity.textContent = cart.length;
+        totalPrice.textContent = cart.reduce((acc, dataset) => acc + dataset.price, 0) + "$";
+
+        // Если в корзине нет датасетов, удаляем .datasets-func
+        if (cart.length === 0) {
+            datasetsFunc.remove();
+        }
+
+        const selectAllCheckbox = document.querySelector('.datasets-func input[type="checkbox"]');
+        const datasetCheckboxes = document.querySelectorAll('.dataset-checkbox');
+        const removeSelectedBtn = document.querySelector('.remove-selected-btn');
+        updateDeleteBtn(removeSelectedBtn);
+        updateCheckboxes(selectAllCheckbox, datasetCheckboxes, removeSelectedBtn);
+    }
 }
 
 // Функция для отправки заказа на бэкенд
@@ -123,23 +209,24 @@ addToCartBtns.forEach((btn) => {
         event.preventDefault(); // Отменяем стандартное действие ссылки
 
         // Получаем id датасета из атрибута data-dataset-id
-        let datasetId = event.target.dataset.datasetId;
+        let datasetId = event.target.id;
 
         // Отправляем запрос на бэк для получения данных о датасете
-        fetch(`/company/datasets/${datasetId}`)
+        fetch(`/get-dataset/${datasetId}`)
             .then((response) => response.json())
             .then((data) => {
                 // Создаем объект датасета
                 let dataset = {
                     id: data.id,
                     name: data.name,
-                    description: data.description,
-                    imageCount: data.imageCount,
-                    categories: data.categories,
-                    format: data.format,
-                    size: data.size,
+                    description: data.name,
                     price: parseFloat(data.price),
-                    image: `/static/images/${data.image}`
+                    count_frames: data.count_frames,
+                    first_frame: data.first_frame,
+                    second_frame: data.second_frame,
+                    categories: '',
+                    format: data.type_dataset.name,
+                    size: data.size,
                 };
 
                 // Добавляем датасет в корзину
@@ -151,29 +238,5 @@ addToCartBtns.forEach((btn) => {
     });
 });
 
-// Навешиваем обработчик события на кнопку "Удалить из корзины"
-const removeBtns = document.querySelectorAll('.remove-btn-cart');
-removeBtns.forEach(btn => {
-    btn.addEventListener('click', function (event) {
-        // Предотвращаем стандартное поведение браузера
-        event.preventDefault();
 
-        // Находим родительский элемент .dataset-cart
-        const datasetCart = event.target.closest('.dataset-cart');
 
-        // Удаляем элемент .dataset-cart из корзины
-        datasetCart.remove();
-
-        // Обновляем количество и общую стоимость товаров в корзине
-        const quantity = document.querySelector('#quantity');
-        const totalPrice = document.querySelector('#total-price');
-        const datasets = document.querySelectorAll('.dataset-cart');
-        quantity.textContent = datasets.length;
-        let total = 0;
-        datasets.forEach(dataset => {
-            const price = parseFloat(dataset.querySelector('.cart-info-container p:nth-child(2)').textContent.replace('$', ''));
-            total += price;
-        });
-        totalPrice.textContent = total.toFixed(2) + '$';
-    });
-});

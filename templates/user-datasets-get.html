@@ -22,7 +22,7 @@
                 <img src="{{ url_for('static', path=dataset.first_frame) }}" alt="{{ dataset.name }}">
                 <h3>Название: {{ dataset.name }}</h3>
             </a>
-            <a href="#" class="download-btn">Скачать</a>
+            <a href="{{ dataset.file_path }}" download="{{ dataset.name }}.zip" class="download-btn">Скачать</a>
         </div>
         {% endfor %}
     </div>

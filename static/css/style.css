@@ -392,10 +392,33 @@ a {
 .cart {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
 }
 
 .datasets-cart {
     width: 40%;
+}
+
+.datasets-func {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 15px;
+}
+
+.remove-selected-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.25rem;
+    display: none;
 }
 
 .dataset-cart {
@@ -437,7 +460,7 @@ a {
 }
 
 .cart h3 {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .checkout-btn-cart {
@@ -783,6 +806,7 @@ a {
     padding: 10px;
     border: 1px solid #e5eaf5;
     background-color: rgb(190 190 190 / 8%);
+    gap: 20px;
 }
 
 .bank-card-info,
@@ -1053,6 +1077,8 @@ input:checked+.slider:before {
     border-radius: 4px;
     font-weight: bold;
     margin: 0 auto;
+    text-decoration: none;
+    color: white;
 }
 
 .download-btn:hover {
