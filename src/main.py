@@ -20,6 +20,10 @@ app.include_router(dataset_router)
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     if exc.status_code == 401:
+        if request.url.path == '/auth/refresh':
+            return templates.TemplateResponse(
+                request=request, name='user-login-get.html'
+            )
         try:
             redirect_response = RedirectResponse('/auth/refresh')
             # Копирование установленных куки в RedirectResponse
