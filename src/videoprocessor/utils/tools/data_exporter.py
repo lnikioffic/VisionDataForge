@@ -2,7 +2,7 @@ import cv2
 import uuid
 import shutil
 from pathlib import Path
-from typing import Protocol, Type
+from typing import Protocol, Type, Tuple
 
 from src.videoprocessor.utils.tools.contour_detector import (
     threshold,
@@ -25,13 +25,13 @@ class ExportImage:
 
 
 class TypeSave(Protocol):
-    def start_creation(self):
+    def start_creation(self) -> None:
         pass
 
-    def create_preview(self):
+    def create_preview(self) -> Tuple[bytes, bytes]:
         pass
 
-    def create_archive(self):
+    def create_archive(self) -> str:
         pass
 
 
@@ -76,7 +76,7 @@ class YoloSave:
             AnnotationSave.txt_frame_save(image, f'{path_txt}{i+1}', self.names_class)
         AnnotationSave.txt_class_save(self.path_folder / 'classes', self.names_class)
 
-    def create_preview(self):
+    def create_preview(self) -> Tuple[bytes, bytes]:
         if len(self.images) == 0:
             return
 
@@ -88,7 +88,8 @@ class YoloSave:
         uu = uuid.uuid4()
         first_frame = BASE_FOLDER_DATA / f'first-{uu}.jpg'
         second_frame = BASE_FOLDER_DATA / f'second-{uu}.jpg'
-        cv2.imwrite(f'{first_frame}', image.image)
+        # cv2.imwrite(f'{first_frame}', image.image)
+        f_frame_b = image.image.copy()
         for ob in image.objects:  # type: ignore ExportObject
             bboxes = AnnotationSave.getting_coordinates(ob.mask)
             for box in bboxes:
@@ -103,11 +104,17 @@ class YoloSave:
                     (0, 255, 255),
                     2,
                 )
-        cv2.imwrite(f'{second_frame}', image.image)
-        return f'{first_frame}', f'{second_frame}'
+            # cv2.imwrite(f'{second_frame}', image.image)
+            # return f'{first_frame}', f'{second_frame}'
 
-    def create_archive(self):
+        _, first_frame_buf = cv2.imencode('.jpg', f_frame_b)
+        _, second_frame_buf = cv2.imencode('.jpg', image.image)
+
+        return first_frame_buf.tobytes(), second_frame_buf.tobytes()
+
+    def create_archive(self) -> str:
         shutil.make_archive(self.path_folder, 'zip', self.path_folder)
+        shutil.rmtree(self.path_folder)
         return f'{self.path_folder}.zip'
 
 

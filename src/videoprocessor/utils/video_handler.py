@@ -3,6 +3,7 @@ import cv2
 import aiofiles
 import os
 from fastapi import UploadFile
+from typing import Tuple
 
 from src.videoprocessor.utils.tracker import TrackersClasses, create_Trackers
 from src.videoprocessor.schemas import (
@@ -139,7 +140,7 @@ class VideoHandler:
 
 async def start_annotation(
     images: list[ExportImage], name_classes: dict, type_save: str = 'yolo_dark'
-):
+) -> Tuple[str, bytes, bytes]:
     type_save_proces = get_type(images, name_classes, type_save)
     type_save_proces.start_creation()
     archive = type_save_proces.create_archive()

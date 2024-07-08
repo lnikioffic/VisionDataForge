@@ -21,7 +21,7 @@ from src.datasets.dependencies import (
 )
 from src.datasets.service import DatasetService
 from src.users.schemas import UserRead
-
+from src.constants import IMAGE_URL
 
 http_bearer = HTTPBearer(auto_error=False)
 router = APIRouter(tags=['datasets'], dependencies=[Depends(http_bearer)])
@@ -58,6 +58,7 @@ async def get_company_datasets(
         name='company-datasets.html',
         context={
             'request': request,
+            'image_url': IMAGE_URL,
             'datasets': paginator._items,
             'paginator': paginator,  # передали объект класса Paginator в качестве аргумента paginator
         },
@@ -75,6 +76,7 @@ async def get_company_datasets(
         request=request,
         name='company-dataset.html',
         context={
+            'image_url': IMAGE_URL,
             'dataset': dataset,
         },
     )

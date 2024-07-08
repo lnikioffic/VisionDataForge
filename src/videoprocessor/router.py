@@ -33,6 +33,7 @@ from src.videoprocessor.utils.video_handler import (
     VideoHandler,
     start_annotation,
 )
+from src.aws.user_storage import UserStorage
 
 
 http_bearer = HTTPBearer(auto_error=False)
@@ -119,15 +120,20 @@ async def annotation(
     file, first_frame, second_frame = await start_annotation(
         images, video_hand.frame_data.names_class, type_annotation.name
     )
-
+    
+    user_storage = UserStorage(user, file, first_frame, second_frame)
+    await user_storage.save_file()
+    await user_storage.save_bytes_as_file()
+    price = len(images) * len(form_data.frame_data.names_class) * 5
+    
     dataset = DatasetCreate(
         name=''.join(form_data.frame_data.names_class),
-        price=1,
+        price=price,
         count_frames=len(images),
         count_classes=len(form_data.frame_data.names_class),
-        file_path=file,
-        first_frame=first_frame,
-        second_frame=second_frame,
+        file_path=user_storage.file_path_save,
+        first_frame=user_storage.first_frame_path_save,
+        second_frame=user_storage.second_frame_path_save,
         size='',
     )
     if user.is_superuser:
