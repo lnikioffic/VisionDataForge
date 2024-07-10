@@ -1,8 +1,9 @@
-fastapi[all]
-numpy
+fastapi[all]==0.110.0
+numpy==1.26.4
 segment-anything-fast
-setuptools
-opencv-contrib-python
+setuptools==69.2.0
+opencv-python==4.9.0.80
+opencv-contrib-python==4.9.0.80
 torch
 alembic
 asyncpg
