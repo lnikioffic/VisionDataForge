@@ -19,6 +19,7 @@ from src.datasets.dependencies import (
 from src.datasets.schemas import DatasetRead
 from src.datasets.service import DatasetService
 from src.users.schemas import UserRead
+from src.constants import IMAGE_URL
 
 
 http_bearer = HTTPBearer(auto_error=False)
@@ -70,7 +71,7 @@ async def get_user_datasets(
         return templates.TemplateResponse(
             request=request,
             name='user-datasets-get.html',
-            context={'datasets': datasets},
+            context={'datasets': datasets, 'image_url': IMAGE_URL,},
         )
 
 
@@ -143,14 +144,5 @@ async def get_user_dataset(
         return templates.TemplateResponse(
             request=request,
             name='user-dataset-get.html',
-            context={'dataset': dataset},
+            context={'dataset': dataset, 'image_url': IMAGE_URL,},
         )
-
-
-# @router.get('/me', response_model=UserRead)
-# async def get_me(
-#     payload: Annotated[dict, Depends(get_current_token_payload)],
-#     me: Annotated[UserRead, Depends(get_current_active_auth_user)]
-#     ):
-#     iat =  payload.get('iat')
-#     return me

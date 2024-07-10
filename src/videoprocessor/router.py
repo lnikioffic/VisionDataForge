@@ -33,7 +33,7 @@ from src.videoprocessor.utils.video_handler import (
     VideoHandler,
     start_annotation,
 )
-from src.aws.user_storage import UserStorage
+from src.aws.user_storage import UserStorageSave
 
 
 http_bearer = HTTPBearer(auto_error=False)
@@ -121,7 +121,7 @@ async def annotation(
         images, video_hand.frame_data.names_class, type_annotation.name
     )
     
-    user_storage = UserStorage(user, file, first_frame, second_frame)
+    user_storage = UserStorageSave(user, file, first_frame, second_frame)
     await user_storage.save_file()
     await user_storage.save_bytes_as_file()
     price = len(images) * len(form_data.frame_data.names_class) * 5
