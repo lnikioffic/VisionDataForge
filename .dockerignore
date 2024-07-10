@@ -1,0 +1,14 @@
+venv
+chekframes.py
+manual_testing.py
+certs
+data/*.zip
+data/*.jpg
+data/time/*.png
+README.md
+.env-example
+.vscode
+.gitignore
+.git
+.venv
+__pycache__

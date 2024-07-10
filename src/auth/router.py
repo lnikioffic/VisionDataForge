@@ -19,7 +19,7 @@ from src.auth.dependencies import (
     get_current_auth_user_for_refresh,
     validate_create_user,
 )
-
+from src.auth.utils import get_cookies_for_login_registration
 from src.users.service import UserService
 
 http_bearer = HTTPBearer(auto_error=False)
@@ -33,23 +33,27 @@ templates = Jinja2Templates(directory='templates')
 # Отображает раздел для авторизации пользователя
 @router.get('/login', response_class=HTMLResponse)
 async def get_user_login(
-    request: Request, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
+    request: Request
 ):
-    if not user:
-        return templates.TemplateResponse(request=request, name='user-login-get.html')
-    return RedirectResponse(url='/users/profile')
+    redirect = await get_cookies_for_login_registration(request)
+    
+    if redirect:
+        return RedirectResponse(url='/users/profile')
+    return templates.TemplateResponse(request=request, name='user-login-get.html')
 
 
 # Отображает раздел для регистрации пользователя
 @router.get('/registration', response_class=HTMLResponse)
 async def get_user_registration(
-    request: Request, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
+    request: Request
 ):
-    if not user:
-        return templates.TemplateResponse(
-            request=request, name='user-registration-get.html'
-        )
-    return RedirectResponse(url='/users/profile')
+    redirect = await get_cookies_for_login_registration(request)
+    
+    if redirect:
+        return RedirectResponse(url='/users/profile')
+    return templates.TemplateResponse(
+        request=request, name='user-registration-get.html'
+    )
 
 
 # Отображает раздел для восстановления пароля пользователя

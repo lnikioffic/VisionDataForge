@@ -1,3 +1,4 @@
+from fastapi import Request
 import jwt
 import bcrypt
 from datetime import timedelta, datetime
@@ -46,3 +47,13 @@ def validate_password(password: str, hash_password: str) -> bool:
     return bcrypt.checkpw(
         password=password.encode(), hashed_password=hash_password.encode()
     )
+
+
+async def get_cookies_for_login_registration(request: Request) -> bool:
+    token = request.cookies.get('access_token')
+    if not token:
+        token = request.cookies.get('refresh_token')
+        
+    if token:
+        return True
+    return False
