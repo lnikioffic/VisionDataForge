@@ -1,7 +1,6 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import EmailStr
 from sqlalchemy import Result, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends, HTTPException, status
 import asyncio
 
 from src.database import db
@@ -11,7 +10,6 @@ from src.datasets.schemas import TypeDatasetCreate, TypeDatasetRead
 from src.users.schemas import UserCreateSuperuser, UserLogin, UserRead
 from src.users.models import User
 from src.datasets.models import TypeDataset
-
 
 
 async def get_user_by_username(username: str, session: AsyncSession) -> UserLogin | None:
