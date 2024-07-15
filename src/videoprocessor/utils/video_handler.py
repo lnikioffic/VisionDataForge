@@ -98,6 +98,22 @@ class VideoHandler:
 
         return images
 
+    def compare_bboxes(self, class_name, box, prev_bboxes_data, threshold=0.15):
+        x, y, width, height = box
+        if class_name not in prev_bboxes_data:
+            return True, (x, y, width, height)
+
+        prev_x, prev_y, prev_width, prev_height = prev_bboxes_data[class_name]
+        cond1 = abs(x - prev_x) <= threshold * prev_width
+        cond2 = abs(y - prev_y) <= threshold * prev_height
+        cond3 = abs(width - prev_width) <= threshold * prev_width
+        cond4 = abs(height - prev_height) <= threshold * prev_height
+
+        if cond1 and cond2 and cond3 and cond4:
+            return True, (x, y, width, height)
+        else:
+            return False, prev_bboxes_data[class_name]
+
     def frame_selection(
         self, trackers_classes: list[TrackersClasses], frame: int = 0
     ) -> list[Frame]:
@@ -107,6 +123,8 @@ class VideoHandler:
         number_frame_save = 0
         frames = []
         video.set(cv2.CAP_PROP_POS_FRAMES, frame)
+        prev_bboxes_data = {}  # Словарь для хранения данных блокбоксов прошлого кадра
+
         while video.isOpened():
             ret, frame = video.read()
             if not ret:
@@ -118,7 +136,13 @@ class VideoHandler:
                     bboxes = []
                     for tracker in trackers.trackers:
                         ret, box = tracker.update(frame)
-                        bboxes.append(box)
+                        class_name = trackers.class_name
+                        accept, new_bbox_data = self.compare_bboxes(
+                            class_name, box, prev_bboxes_data
+                        )
+                        if accept:
+                            prev_bboxes_data[class_name] = new_bbox_data
+                            bboxes.append(box)
                     rois_object = {'name': trackers.class_name, 'bboxes': bboxes}
                     list_rois.append(rois_object)
 
@@ -129,8 +153,9 @@ class VideoHandler:
             if number_frame_save == 0:
                 roi = []
                 for i in list_rois:
-                    roi.append(ROIsObject(name_class=i['name'], ROIs=i['bboxes']))
-                frames.append(Frame(frame, roi))
+                    if i['bboxes']:
+                        roi.append(ROIsObject(name_class=i['name'], ROIs=i['bboxes']))
+                        frames.append(Frame(frame, roi))
             number_frame_save += 1
             number_frame_save %= 30
 
