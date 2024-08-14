@@ -18,6 +18,7 @@ from src.datasets.dependencies import (
     get_dataset_for_sale_depend,
     get_dataset_by_user_id_depend,
     valid_dataset_id,
+    get_dataset_by_id_and_user_for_delete,
 )
 from src.datasets.service import DatasetService
 from src.users.schemas import UserRead
@@ -82,14 +83,6 @@ async def get_company_datasets(
     )
 
 
-# api
-@router.get('/get-types-dataset', response_model=list[TypeDatasetRead])
-async def get_types_dataset(
-    types: Annotated[list[TypeDatasetRead], Depends(get_types_depend)]
-):
-    return types
-
-
 @router.get('/get-datasets/{page}', response_model=list[DatasetRead])
 async def get_datasets(
     request: Request,
@@ -106,6 +99,26 @@ async def get_datasets(
         'datasets': paginator._items,
         'paginator': paginator,  # передали объект класса Paginator в качестве аргумента paginator
     }
+
+
+# api
+@router.get('/get-types-dataset', response_model=list[TypeDatasetRead])
+async def get_types_dataset(
+    types: Annotated[list[TypeDatasetRead], Depends(get_types_depend)]
+):
+    return types
+
+
+@router.delete('/delete_dataset/{dataset_id}')
+async def delete_dataset(
+    status: Annotated[str, Depends(get_dataset_by_id_and_user_for_delete)]
+):
+    return status
+
+
+'''
+Не используется
+'''
 
 
 @router.get('/get-datasets-user', response_model=list[DatasetRead])
