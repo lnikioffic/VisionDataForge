@@ -9,7 +9,6 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from src.auth.dependencies import (
     get_current_active_auth_user,
-    get_current_auth_user_for_refresh,
     get_current_token_payload,
 )
 from src.datasets.dependencies import (
@@ -40,8 +39,6 @@ async def get_user_cart(request: Request):
 async def get_user_profile(
     request: Request, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
 ):
-    if not user:
-        user = Annotated[UserRead, Depends(get_current_auth_user_for_refresh)]
     return templates.TemplateResponse(
         request=request, name='user-account-get.html', context={'user': user}
     )
@@ -52,8 +49,6 @@ async def get_user_profile(
 async def get_user_account(
     request: Request, user: Annotated[UserRead, Depends(get_current_active_auth_user)]
 ):
-    if not user:
-        user = Annotated[UserRead, Depends(get_current_auth_user_for_refresh)]
     return templates.TemplateResponse(
         request=request, name='user-account-get.html', context={'user': user}
     )
@@ -75,14 +70,14 @@ async def get_user_datasets(
         )
 
 
-@router.get('/get-datasets-user', response_model=list[DatasetRead])
-async def get_datasets_user(
-    payload: Annotated[dict, Depends(get_current_token_payload)],
-    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
-    service: Annotated[DatasetService, Depends()],
-):
-    dataset = await get_dataset_by_user_id_depend(user.id, service)
-    return dataset
+# @router.get('/get-datasets-user', response_model=list[DatasetRead])
+# async def get_datasets_user(
+#     payload: Annotated[dict, Depends(get_current_token_payload)],
+#     user: Annotated[UserRead, Depends(get_current_active_auth_user)],
+#     service: Annotated[DatasetService, Depends()],
+# ):
+#     dataset = await get_dataset_by_user_id_depend(user.id, service)
+#     return dataset
 
 
 # Отображает раздел профиля с настройками безопасности пользователя

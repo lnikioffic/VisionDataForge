@@ -1,8 +1,10 @@
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Path, status
+from src.auth.dependencies import get_current_active_auth_user
 from src.datasets.service import TypeDatasetService, DatasetService
 from src.datasets.schemas import TypeDatasetRead, DatasetRead
+from src.users.schemas import UserRead
 
 
 error_found = HTTPException(
@@ -57,3 +59,14 @@ async def get_dataset_by_user_id_depend(
 ) -> list[DatasetRead]:
     dataset = await service.get_dataset_by_user_id(user_id)
     return list(dataset)
+
+
+async def get_dataset_by_id_and_user_for_delete(
+    dataset_id: Annotated[int, Path],
+    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
+    service: Annotated[DatasetService, Depends()],
+):
+    if user.is_superuser:
+        st = await service.delete_dataset_by_id(dataset_id)
+        return st
+    return f'This {user.username} is not super user {user.is_superuser=}'

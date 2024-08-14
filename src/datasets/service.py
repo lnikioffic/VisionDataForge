@@ -1,6 +1,5 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine import Result
-from sqlalchemy import func, select
+from sqlalchemy import func, select, delete
 from sqlalchemy.orm import joinedload, selectinload
 
 from src.datasets.models import TypeDataset, Dataset
@@ -48,7 +47,7 @@ class DatasetService(Service):
         return total_count
 
     async def create_dataset(
-        self, dataset: DatasetCreate, type_dataset_id, user_id
+        self, dataset: DatasetCreate, type_dataset_id: int, user_id: int
     ) -> DatasetRead:
         dataset_db = Dataset(
             **dataset.model_dump(), user_id=user_id, type_dataset_id=type_dataset_id
@@ -57,7 +56,7 @@ class DatasetService(Service):
         await self.session.commit()
         return dataset_db
 
-    async def get_dataset_by_user_id(self, id):
+    async def get_dataset_by_user_id(self, id) -> list[DatasetRead]:
         stmt = (
             select(Dataset)
             .filter(Dataset.user_id == id)
@@ -67,7 +66,7 @@ class DatasetService(Service):
         datasets = result.scalars().all()
         return list(datasets)
 
-    async def get_dataset_by_id(self, id):
+    async def get_dataset_by_id(self, id) -> DatasetRead:
         stmt = (
             select(Dataset)
             .filter(Dataset.id == id)
@@ -76,3 +75,12 @@ class DatasetService(Service):
         result: Result = await self.session.execute(stmt)
         dataset = result.scalar()
         return dataset
+
+    async def delete_dataset_by_id(self, id):
+        try:
+            stmt = delete(Dataset).filter(Dataset.id == id)
+            await self.session.execute(stmt)
+            await self.session.commit()
+        except Exception as ex:
+            await self.session.rollback()
+            return f'excption {ex}'
