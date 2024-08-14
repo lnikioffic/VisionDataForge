@@ -4,8 +4,6 @@ FROM nvidia/cuda:12.1.0-base-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive \
     TZ=Europe/Stockholm
 
-RUN mkdir /app
-
 WORKDIR /app
 
 COPY ./requirements/req2.txt /app/req3.txt
@@ -30,4 +28,4 @@ RUN pip3 install --no-cache-dir -r req3.txt
 
 COPY . .
 
-RUN chmod a+x /app/docker/*.bash
+RUN chmod a+x /app/docker/*.sh
