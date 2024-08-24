@@ -15,10 +15,13 @@ from src.datasets.dependencies import (
     get_dataset_by_user_id_depend,
     valid_dataset_id,
 )
+from src.users.dependencies import user_by_id
 from src.datasets.schemas import DatasetRead
 from src.datasets.service import DatasetService
-from src.users.schemas import UserRead
+from src.users.models import User
+from src.users.schemas import UserRead, UserUpdate, UserUpdatePartial
 from src.constants import IMAGE_URL
+from src.users.service import UserService
 
 
 http_bearer = HTTPBearer(auto_error=False)
@@ -66,7 +69,10 @@ async def get_user_datasets(
         return templates.TemplateResponse(
             request=request,
             name='user-datasets-get.html',
-            context={'datasets': datasets, 'image_url': IMAGE_URL,},
+            context={
+                'datasets': datasets,
+                'image_url': IMAGE_URL,
+            },
         )
 
 
@@ -139,5 +145,30 @@ async def get_user_dataset(
         return templates.TemplateResponse(
             request=request,
             name='user-dataset-get.html',
-            context={'dataset': dataset, 'image_url': IMAGE_URL,},
+            context={
+                'dataset': dataset,
+                'image_url': IMAGE_URL,
+            },
         )
+
+
+@router.patch('/update-user')
+async def update_user_partial(
+    user_update: UserUpdatePartial,
+    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
+    service: Annotated[UserService, Depends()],
+) -> UserRead:
+    user_model = await service.get_user_by_id(user.id)
+    return await service.update_user(user=user, user_update=user_update, partial=True)
+
+
+@router.put('/update-user')
+async def update_user(
+    user_update: UserUpdate,
+    user: Annotated[UserRead, Depends(get_current_active_auth_user)],
+    service: Annotated[UserService, Depends()],
+) -> UserRead:
+    user_model = await service.get_user_by_id(user.id)
+    return await service.update_user(
+        user=user_model, user_update=user_update
+    )
