@@ -1,7 +1,6 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException, Path, status
 
-from src.users.models import User
 from src.users.schemas import UserLogin, UserRead
 from src.users.service import UserService
 
@@ -24,15 +23,6 @@ async def valid_user_username(user_name: str, service: UserService) -> UserLogin
 async def valid_user_id(
     user_id: Annotated[int, Path], service: UserService
 ) -> UserRead | None:
-    user = await service.get_user_by_id(user_id)
-
-    if not user:
-        raise error_found
-
-    return user
-
-
-async def user_by_id(user_id: Annotated[int, Path], service: Annotated[UserService, Depends()]) -> User:
     user = await service.get_user_by_id(user_id)
 
     if not user:

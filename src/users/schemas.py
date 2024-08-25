@@ -36,11 +36,10 @@ class UserUpdatePartial(UserCreate):
     email: EmailStr | None = None
 
     is_active: bool | None = None
-    is_verified: bool | None = None
+    is_verified: bool | None = False
     hashed_password: str | None = None
     
     
 class UserUpdate(UserCreate):
     is_active: bool = True
-    is_superuser: bool = False
     is_verified: bool = False
