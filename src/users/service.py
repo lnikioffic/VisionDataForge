@@ -1,4 +1,3 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine import Result
 from sqlalchemy import select
 from fastapi import Depends, HTTPException, status
@@ -52,14 +51,15 @@ class UserService(Service):
 
     async def update_user(
         self,
-        user: User,
+        user: UserRead,
         user_update: UserUpdate | UserUpdatePartial,
         partial: bool = False,
     ) -> UserRead:
         user_data = user_update.model_dump(exclude_unset=partial)
-        user_data['hashed_password'] = auth_utils.hash_password(
-            user_data['hashed_password']
-        ).decode()
+        if user_data['hashed_password'] != None:
+            user_data['hashed_password'] = auth_utils.hash_password(
+                user_data['hashed_password']
+            ).decode()
         for key, value in user_data.items():
             if value != None:
                 setattr(user, key, value)
