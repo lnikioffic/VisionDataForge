@@ -31,10 +31,15 @@ class UserCreateSuperuser(UserCreate):
     is_superuser: bool
 
 
-class UserUpdate(UserCreate):
+class UserUpdatePartial(UserCreate):
     username: str | None = None
     email: EmailStr | None = None
 
     is_active: bool | None = None
-    is_verified: bool | None = None
+    is_verified: bool | None = False
     hashed_password: str | None = None
+    
+    
+class UserUpdate(UserCreate):
+    is_active: bool = True
+    is_verified: bool = False

@@ -1,5 +1,4 @@
 from pydantic import BaseModel, ConfigDict
-from datetime import datetime
 
 from src.datasets.schemas import DatasetRead
 from src.users.schemas import UserRead
