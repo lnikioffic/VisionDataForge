@@ -88,7 +88,7 @@ docker-compose up -d --build
 #### Интерфейс платформы и процесс аннотирования
 Платформа Vision Data Forge предоставляет удобный интерфейс для создания датасетов.
 
-![Навигационная схема](https://drive.google.com/file/d/1APs8FQoNC37ib6atHEo2huOmyGuNOZBc/view?usp=sharing)
+![Навигационная схема](https://drive.google.com/uc?export=view&id=1APs8FQoNC37ib6atHEo2huOmyGuNOZBc)
 
 ##### 1. Загрузка видео:
 
