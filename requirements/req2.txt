@@ -72,7 +72,7 @@ opencv-python==4.9.0.80
 orjson==3.10.6
 packaging==24.1
 pandas==2.2.2
-pillow==10.4.0
+pillow==12.2.0
 psutil==6.0.0
 pycparser==2.22
 pydantic==2.8.2
