@@ -69,7 +69,7 @@ nvidia-nvtx-cu12==12.1.105
 openai-clip==1.0.1
 opencv-contrib-python==4.9.0.80
 opencv-python==4.9.0.80
-orjson==3.10.6
+orjson==3.11.6
 packaging==24.1
 pandas==2.2.2
 pillow==12.2.0
