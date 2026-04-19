@@ -102,7 +102,7 @@ tqdm==4.66.2
 typing_extensions==4.10.0
 tzdata==2024.1
 uc-micro-py==1.0.3
-ujson==5.9.0
+ujson==5.12.0
 ultralytics==8.0.122
 urllib3==2.2.1
 uvicorn==0.29.0
